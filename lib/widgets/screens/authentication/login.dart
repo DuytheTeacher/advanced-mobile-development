@@ -12,7 +12,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final String appTitle = 'LET TURTOR';
+  final String logoTitle = 'LET TURTOR';
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class _LoginState extends State<Login> {
                   'assets/images/tutor_logo.png',
                   fit: BoxFit.cover,
                 )),
-            Text(appTitle,
+            Text(logoTitle,
                 style: const TextStyle(
                     color: Colors.blue,
                     fontWeight: FontWeight.bold,
@@ -48,8 +48,8 @@ class _LoginState extends State<Login> {
             controller: emailController,
             enableSuggestions: false,
             autocorrect: false,
-            autofocus: true,
           ),
+          const SizedBox(height: 20),
           TextField(
             decoration: const InputDecoration(
                 labelText: 'Password', hintText: '*********'),
@@ -145,7 +145,7 @@ class _LoginState extends State<Login> {
             const Text('Don\'t have account? '),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, 'register');
+                Navigator.pushNamed(context, '/register');
               },
               child: const Text(
                 'Register',

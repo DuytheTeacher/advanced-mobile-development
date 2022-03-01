@@ -1,4 +1,5 @@
 import 'package:advanced_mobile_dev/widgets/screens/authentication/login.dart';
+import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
 
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
       ),
       routes: <String, WidgetBuilder>{
         '/login': (BuildContext context) => const Login(title: 'Login'),
-        // '/b': (BuildContext context) => MyPage(title: 'page B'),
+        '/register': (BuildContext context) =>
+            const Register(title: 'Register'),
         // '/c': (BuildContext context) => MyPage(title: 'page C'),
       },
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
