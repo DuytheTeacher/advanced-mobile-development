@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/login.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
 
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
         '/login': (BuildContext context) => const Login(title: 'Login'),
         '/register': (BuildContext context) =>
             const Register(title: 'Register'),
-        // '/c': (BuildContext context) => MyPage(title: 'page C'),
+        '/forgot-password': (BuildContext context) =>
+            const ForgotPassword(title: 'Forgot Password'),
       },
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );

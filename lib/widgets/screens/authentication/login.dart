@@ -70,7 +70,7 @@ class _LoginState extends State<Login> {
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, 'register');
+                Navigator.pushNamed(context, '/forgot-password');
               },
               child: const Text(
                 'Forgot Password?',
