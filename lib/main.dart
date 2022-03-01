@@ -1,6 +1,7 @@
 import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/login.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
 
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'LET TUTOR',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         '/forgot-password': (BuildContext context) =>
             const ForgotPassword(title: 'Forgot Password'),
       },
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'LetTutor'),
     );
   }
 }
@@ -43,22 +44,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+    return const Scaffold(
+      appBar: null,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login');
-              },
-              child: const Text('Login'),
-            ),
-          ],
-        ),
+        // child: Column(
+        //   mainAxisAlignment: MainAxisAlignment.start,
+        //   children: <Widget>[
+        //     ElevatedButton(
+        //       onPressed: () {
+        //         Navigator.pushNamed(context, '/login');
+        //       },
+        //       child: const Text('Login'),
+        //     ),
+        //   ],
+        // ),
+        child: Tabbar(),
       ),
       resizeToAvoidBottomInset: false,
     );
