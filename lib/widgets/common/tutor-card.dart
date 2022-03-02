@@ -61,11 +61,18 @@ class _TutorCardState extends State<TutorCard> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: <Widget>[
-          const Expanded(
+          Expanded(
               flex: 1,
               child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00'),
+                child: ClipOval(
+                  child: Image.network(
+                    'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                radius: 30,
               )),
           Expanded(
             flex: 6,
@@ -107,12 +114,17 @@ class _TutorCardState extends State<TutorCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [_tutorInfo(), _tutorDescription()],
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/tutor-detail');
+      },
+      child: Card(
+        elevation: 5,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [_tutorInfo(), _tutorDescription()],
+          ),
         ),
       ),
     );

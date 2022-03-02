@@ -2,6 +2,7 @@ import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-passwo
 import 'package:advanced_mobile_dev/widgets/screens/authentication/login.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
             const Register(title: 'Register'),
         '/forgot-password': (BuildContext context) =>
             const ForgotPassword(title: 'Forgot Password'),
+        '/tutor-detail': (BuildContext context) =>
+            const TutorDetail(title: 'Tutor')
       },
       home: const MyHomePage(title: 'LetTutor'),
     );

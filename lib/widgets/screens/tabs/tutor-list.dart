@@ -68,7 +68,7 @@ class _TurtorListState extends State<TurtorList> {
     return SizedBox(
       height: 483.4,
       child: ListView.separated(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: 3,
         itemBuilder: (BuildContext context, int index) {
           return const Center(child: TutorCard());
