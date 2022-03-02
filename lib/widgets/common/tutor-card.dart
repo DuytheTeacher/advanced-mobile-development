@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart';
 
 class TutorCard extends StatefulWidget {
   const TutorCard({Key? key}) : super(key: key);
@@ -38,50 +37,23 @@ class _TutorCardState extends State<TutorCard> {
 
   _generateBadges() {
     return SizedBox(
-      height: 40,
-      width: double.infinity,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          Chip(
-            backgroundColor: Theme.of(context).primaryColorLight,
-            label: Text('BADGE',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 8)),
-          ),
-          Chip(
-            backgroundColor: Theme.of(context).primaryColorLight,
-            label: Text('BADGE',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 8)),
-          ),
-          Chip(
-            backgroundColor: Theme.of(context).primaryColorLight,
-            label: Text('BADGE',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 8)),
-          ),
-          Chip(
-            backgroundColor: Theme.of(context).primaryColorLight,
-            label: Text('BADGE',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 8)),
-          ),
-          Chip(
-            backgroundColor: Theme.of(context).primaryColorLight,
-            label: Text('BADGE',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 8)),
-          ),
-          Chip(
-            backgroundColor: Theme.of(context).primaryColorLight,
-            label: Text('BADGE',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 8)),
-          ),
-        ],
-      ),
-    );
+        height: 40,
+        width: double.infinity,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: List.generate(
+              6,
+              (index) => Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Chip(
+                      backgroundColor: Theme.of(context).primaryColorLight,
+                      label: Text('BADGE',
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 8)),
+                    ),
+                  )),
+        ));
   }
 
   _tutorInfo() {
@@ -96,7 +68,7 @@ class _TutorCardState extends State<TutorCard> {
                     'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00'),
               )),
           Expanded(
-            flex: 7,
+            flex: 6,
             child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 0, horizontal: 10),

@@ -2,18 +2,15 @@ import 'package:advanced_mobile_dev/widgets/common/tutor-card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key, required this.title}) : super(key: key);
+  const HomeScreen({Key? key, required this.seclectPage}) : super(key: key);
 
-  final String title;
+  final Function seclectPage;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> entries = <String>['A', 'B', 'C'];
-  final List<int> colorCodes = <int>[600, 500, 100];
-
   _bookingSection() {
     return Container(
         width: double.infinity,
@@ -67,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, 'teachers-list');
+              widget.seclectPage(2);
             },
             child: Text(
               'See all >',
@@ -84,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       height: 401,
       child: ListView.separated(
         padding: const EdgeInsets.all(8),
-        itemCount: entries.length,
+        itemCount: 3,
         itemBuilder: (BuildContext context, int index) {
           return const Center(child: TutorCard());
         },
