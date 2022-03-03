@@ -14,7 +14,9 @@ class _SettingsState extends State<Settings> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, '/profile');
+          },
           child: Padding(
             padding: const EdgeInsets.all(15),
             child: Row(

@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/widgets/screens/tabs/courses.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/history.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/home-screen.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/schedule.dart';
@@ -27,6 +28,7 @@ class _TabbarState extends State<Tabbar> {
       {'page': HomeScreen(seclectPage: _seclectPage), 'title': 'Home'},
       {'page': const Schedule(), 'title': 'Schedule'},
       {'page': const TurtorList(), 'title': 'Tutors'},
+      {'page': const Courses(), 'title': 'Courses'},
       {'page': const History(), 'title': 'History'},
       {'page': const Settings(), 'title': 'Settings'},
     ];
@@ -49,6 +51,8 @@ class _TabbarState extends State<Tabbar> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Upcoming'),
           BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Tutors'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book_rounded), label: 'Courses'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: 'Settings'),

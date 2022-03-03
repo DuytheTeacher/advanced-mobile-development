@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/login.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
@@ -28,7 +29,8 @@ class MyApp extends StatelessWidget {
         '/forgot-password': (BuildContext context) =>
             const ForgotPassword(title: 'Forgot Password'),
         '/tutor-detail': (BuildContext context) =>
-            const TutorDetail(title: 'Tutor')
+            const TutorDetail(title: 'Tutor'),
+        '/profile': (BuildContext context) => const Profile(title: 'Profile')
       },
       home: const MyHomePage(title: 'LetTutor'),
     );
@@ -50,17 +52,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return const Scaffold(
       appBar: null,
       body: Center(
-        // child: Column(
-        //   mainAxisAlignment: MainAxisAlignment.start,
-        //   children: <Widget>[
-        //     ElevatedButton(
-        //       onPressed: () {
-        //         Navigator.pushNamed(context, '/login');
-        //       },
-        //       child: const Text('Login'),
-        //     ),
-        //   ],
-        // ),
         child: Tabbar(),
       ),
       resizeToAvoidBottomInset: false,
