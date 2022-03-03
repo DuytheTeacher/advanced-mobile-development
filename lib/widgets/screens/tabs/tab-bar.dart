@@ -1,6 +1,7 @@
 import 'package:advanced_mobile_dev/widgets/screens/tabs/history.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/home-screen.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/schedule.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tabs/settings.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
 
@@ -27,9 +28,7 @@ class _TabbarState extends State<Tabbar> {
       {'page': const Schedule(), 'title': 'Schedule'},
       {'page': const TurtorList(), 'title': 'Tutors'},
       {'page': const History(), 'title': 'History'},
-      {'page': const History(), 'title': 'History'},
-
-      // {'screen': const TutorLuis(), 'title': 'Home'}
+      {'page': const Settings(), 'title': 'Settings'},
     ];
 
     return Scaffold(
