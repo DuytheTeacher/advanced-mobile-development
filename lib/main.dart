@@ -2,6 +2,7 @@ import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/login.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
+import 'package:advanced_mobile_dev/widgets/screens/courses/course-detail.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 
@@ -30,7 +31,9 @@ class MyApp extends StatelessWidget {
             const ForgotPassword(title: 'Forgot Password'),
         '/tutor-detail': (BuildContext context) =>
             const TutorDetail(title: 'Tutor'),
-        '/profile': (BuildContext context) => const Profile(title: 'Profile')
+        '/profile': (BuildContext context) => const Profile(title: 'Profile'),
+        '/course-detail': (BuildContext context) =>
+            const CourseDetail(title: 'Course Detail'),
       },
       home: const MyHomePage(title: 'LetTutor'),
     );

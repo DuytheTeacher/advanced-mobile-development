@@ -13,36 +13,41 @@ class _CoursesState extends State<Courses> {
       padding: const EdgeInsets.only(bottom: 15.0),
       child: SizedBox(
         width: 300,
-        child: Card(
-          elevation: 4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Image.network(
-                'https://camblycurriculumicons.s3.amazonaws.com/5e0e8b212ac750e7dc9886ac?h=d41d8cd98f00b204e9800998ecf8427e',
-                fit: BoxFit.cover,
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  'Life in the Internet Age',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, '/course-detail');
+          },
+          child: Card(
+            elevation: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Image.network(
+                  'https://camblycurriculumicons.s3.amazonaws.com/5e0e8b212ac750e7dc9886ac?h=d41d8cd98f00b204e9800998ecf8427e',
+                  fit: BoxFit.cover,
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                child: Text(
-                  'Let\'s discuss how technology is changing the way we live',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    'Life in the Internet Age',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 20, bottom: 10, left: 10),
-                child: Text(
-                  'Beginner - 9 lessons',
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                  child: Text(
+                    'Let\'s discuss how technology is changing the way we live',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                 ),
-              ),
-            ],
+                const Padding(
+                  padding: EdgeInsets.only(top: 20, bottom: 10, left: 10),
+                  child: Text(
+                    'Beginner - 9 lessons',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
