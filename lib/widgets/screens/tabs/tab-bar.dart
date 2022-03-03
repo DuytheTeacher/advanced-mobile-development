@@ -1,4 +1,5 @@
 import 'package:advanced_mobile_dev/widgets/screens/tabs/home-screen.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tabs/schedule.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,7 @@ class _TabbarState extends State<Tabbar> {
   Widget build(BuildContext context) {
     final List<Map<String, Object>> _pages = [
       {'page': HomeScreen(seclectPage: _seclectPage), 'title': 'Home'},
-      {'page': const TurtorList(), 'title': 'Tutors'},
+      {'page': const Schedule(), 'title': 'Schedule'},
       {'page': const TurtorList(), 'title': 'Tutors'},
       {'page': const TurtorList(), 'title': 'Tutors'},
 

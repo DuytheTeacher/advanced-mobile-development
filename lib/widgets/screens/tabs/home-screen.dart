@@ -22,28 +22,69 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                'Welcome to LetTutor!',
+                'Total lesons time is 84 hours 10 minutes',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Theme.of(context).scaffoldBackgroundColor),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text(
-                  'Book a lesson',
-                  style: TextStyle(
-                      fontSize: 12, color: Theme.of(context).primaryColor),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                 ),
-                style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).scaffoldBackgroundColor,
-                    fixedSize: const Size(120, double.minPositive),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50))),
-              )
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  'Upcoming lesson',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                        flex: 5,
+                        child: Text(
+                          'Thu, 03 Mar 22, 20:00 - 21:30',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                        )),
+                    Expanded(
+                      flex: 4,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              Icons.video_call_rounded,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            Text(
+                              'Enter lesson room',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).primaryColor),
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).scaffoldBackgroundColor,
+                            fixedSize: const Size(120, double.minPositive),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50))),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ));
@@ -78,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _listRecommendedTutors() {
     return SizedBox(
-      height: 401,
+      height: 327,
       child: ListView.separated(
         padding: const EdgeInsets.all(8),
         itemCount: 3,
