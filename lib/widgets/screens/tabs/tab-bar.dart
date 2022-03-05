@@ -35,11 +35,13 @@ class _TabbarState extends State<Tabbar> {
 
     return Scaffold(
       appBar: AppBar(
-          title: Text(_pages[_selectedIndex]['title'] as String,
-              style: TextStyle(
-                  color: Theme.of(context).primaryColor, fontSize: 16)),
-          elevation: 0,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor),
+        title: Text(_pages[_selectedIndex]['title'] as String,
+            style:
+                TextStyle(color: Theme.of(context).primaryColor, fontSize: 16)),
+        elevation: 0,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
+      ),
       body: _pages[_selectedIndex]['page'] as Widget,
       bottomNavigationBar: BottomNavigationBar(
         onTap: _seclectPage,

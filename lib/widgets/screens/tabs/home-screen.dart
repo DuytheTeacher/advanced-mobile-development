@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                         flex: 5,
                         child: Text(
-                          'Thu, 03 Mar 22, 20:00 - 21:30',
+                          'Sun, 06 Mar 22, 20:00 - 21:30',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 18,

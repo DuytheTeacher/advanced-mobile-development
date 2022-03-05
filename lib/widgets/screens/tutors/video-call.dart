@@ -11,7 +11,7 @@ class VideoCall extends StatefulWidget {
 
 class _VideoCallState extends State<VideoCall> with TickerProviderStateMixin {
   DateTime now = DateTime.now();
-  DateTime then = DateTime(2022, 3, 5, 14, 50, 0);
+  DateTime then = DateTime(2022, 3, 6, 20, 0, 0);
   late AnimationController controller;
   bool isPlaying = true;
 
@@ -23,7 +23,7 @@ class _VideoCallState extends State<VideoCall> with TickerProviderStateMixin {
 
   String get countText {
     Duration count = controller.duration! * controller.value;
-    return '${count.inHours}:${(count.inMinutes % 60).toString().padLeft(2, '0')}:${(count.inSeconds % 60).toString().padLeft(2, '0')} until lesson starts (Sun, 06, Mar 22 21:00)';
+    return '${count.inHours}:${(count.inMinutes % 60).toString().padLeft(2, '0')}:${(count.inSeconds % 60).toString().padLeft(2, '0')} until lesson starts (Sun, 06, Mar 22 20:00)';
   }
 
   void _startTimer() {

@@ -142,7 +142,9 @@ class _SettingsState extends State<Settings> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, '/become-tutor');
+          },
           child: Row(
             children: [
               Icon(

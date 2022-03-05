@@ -121,7 +121,7 @@ class _HistoryState extends State<History> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const Text(
-                'Thu, 03 Mar 22',
+                'Sun, 06 Mar 22',
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
               ),
               const Text('21 hours ago'),
