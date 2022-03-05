@@ -120,7 +120,7 @@ class _RegisterState extends State<Register> {
             const Text('Already have an account? '),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/login');
+                Navigator.pop(context);
               },
               child: const Text(
                 'Log In',

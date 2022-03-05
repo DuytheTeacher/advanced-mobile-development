@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key, required this.title}) : super(key: key);
+  const Login({Key? key, required this.title, required this.login})
+      : super(key: key);
 
   final String title;
+  final Function login;
 
   @override
   State<Login> createState() => _LoginState();
@@ -92,7 +94,9 @@ class _LoginState extends State<Login> {
                 fixedSize: const Size(300, 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
-            onPressed: () {},
+            onPressed: () {
+              widget.login();
+            },
             child: const Text(
               'Log In',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),

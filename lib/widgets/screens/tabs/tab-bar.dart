@@ -7,7 +7,11 @@ import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
 
 class Tabbar extends StatefulWidget {
-  const Tabbar({Key? key}) : super(key: key);
+  // const Tabbar({Key? key, this._logoutCallback}) : super(key: key);
+
+  const Tabbar(this.logoutCallback);
+
+  final Function logoutCallback;
 
   @override
   _TabbarState createState() => _TabbarState();
@@ -30,7 +34,13 @@ class _TabbarState extends State<Tabbar> {
       {'page': const TurtorList(), 'title': 'Tutors'},
       {'page': const Courses(), 'title': 'Courses'},
       {'page': const History(), 'title': 'History'},
-      {'page': Settings(seclectPage: _seclectPage), 'title': 'Settings'},
+      {
+        'page': Settings(
+          seclectPage: _seclectPage,
+          logout: widget.logoutCallback,
+        ),
+        'title': 'Settings'
+      },
     ];
 
     return Scaffold(

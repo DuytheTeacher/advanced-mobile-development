@@ -25,8 +25,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
       ),
+      initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        '/login': (BuildContext context) => const Login(title: 'Login'),
+        // '/login': (BuildContext context) => const Login(title: 'Login'),
         '/register': (BuildContext context) =>
             const Register(title: 'Register'),
         '/forgot-password': (BuildContext context) =>
@@ -56,12 +57,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool authenticated = false;
+
+  _loginCallback() {
+    setState(() {
+      authenticated = true;
+    });
+  }
+
+  _logoutCallback() {
+    setState(() {
+      authenticated = false;
+    });
+  }
+
+  _renderScreen() {
+    print(authenticated);
+    if (authenticated == true) {
+      return Tabbar(_logoutCallback);
+    } else {
+      return Login(
+        title: 'Login',
+        login: _loginCallback,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar: null,
       body: Center(
-        child: Tabbar(),
+        child: _renderScreen(),
       ),
       resizeToAvoidBottomInset: false,
     );

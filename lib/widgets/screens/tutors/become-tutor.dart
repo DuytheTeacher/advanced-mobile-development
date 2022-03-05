@@ -271,7 +271,7 @@ class _BecomeTutorState extends State<BecomeTutor> {
         ),
         ElevatedButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
+              Navigator.pop(context);
             },
             child: const Text('Back to home'))
       ],
