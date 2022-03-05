@@ -30,7 +30,7 @@ class _TabbarState extends State<Tabbar> {
       {'page': const TurtorList(), 'title': 'Tutors'},
       {'page': const Courses(), 'title': 'Courses'},
       {'page': const History(), 'title': 'History'},
-      {'page': const Settings(), 'title': 'Settings'},
+      {'page': Settings(seclectPage: _seclectPage), 'title': 'Settings'},
     ];
 
     return Scaffold(

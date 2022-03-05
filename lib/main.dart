@@ -5,6 +5,7 @@ import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart
 import 'package:advanced_mobile_dev/widgets/screens/courses/course-detail.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
 
 import 'package:flutter/material.dart';
 
@@ -34,6 +35,8 @@ class MyApp extends StatelessWidget {
         '/profile': (BuildContext context) => const Profile(title: 'Profile'),
         '/course-detail': (BuildContext context) =>
             const CourseDetail(title: 'Course Detail'),
+        '/video-call': (BuildContext context) =>
+            const VideoCall(title: 'Video Call'),
       },
       home: const MyHomePage(title: 'LetTutor'),
     );

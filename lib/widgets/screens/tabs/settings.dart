@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({Key? key, required this.seclectPage}) : super(key: key);
+
+  final Function seclectPage;
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -106,7 +108,9 @@ class _SettingsState extends State<Settings> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            widget.seclectPage(3);
+          },
           child: Row(
             children: [
               Icon(

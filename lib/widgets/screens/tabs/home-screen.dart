@@ -59,7 +59,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       flex: 4,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/video-call');
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

@@ -64,6 +64,7 @@ flutter:
     - assets/images/schedule_logo.png
     - assets/images/history_logo.png
     - assets/images/courses_logo.png
+    - assets/images/demo_video_call.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
