@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +19,8 @@ class _SettingsState extends State<Settings> {
     final userData = Provider.of<UserProvider>(context);
 
     _profileItem() {
+      final imageFile = File(userData.currentUser.imageUrl);
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: SizedBox(
@@ -33,8 +37,13 @@ class _SettingsState extends State<Settings> {
                       flex: 1,
                       child: CircleAvatar(
                         child: ClipOval(
-                          child: Image.network(
+                          child: userData.currentUser.imageUrl == '' ? Image.network(
                             'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ) : Image.file(
+                            imageFile,
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
@@ -47,19 +56,19 @@ class _SettingsState extends State<Settings> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const <Widget>[
+                        children: <Widget>[
                           Text(
-                            'Account name',
-                            style: TextStyle(
+                            userData.currentUser.fullName,
+                            style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.symmetric(vertical: 5),
                             child: Text(
-                              'acount@email.com.vn',
-                              style: TextStyle(
+                              userData.currentUser.email,
+                              style: const TextStyle(
                                   fontSize: 12, color: Color(0xFF616161)),
                             ),
                           ),

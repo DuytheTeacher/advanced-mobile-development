@@ -2,23 +2,28 @@ import 'package:flutter/foundation.dart';
 
 class User {
   final String email;
-  final String password;
-  final DateTime birthday;
-  final String phone;
-  final String country;
-  final String level;
+  String password;
+  DateTime birthday;
+  String phone;
+  String country;
+  String level;
+  String imageUrl;
   final String fullName;
 
-  User(this.email, this.password, this.birthday, this.phone, this.country, this.level, this.fullName);
+  User(this.email, this.password, this.birthday, this.phone, this.country, this.level, this.imageUrl, this.fullName);
 }
 
 class UserProvider with ChangeNotifier {
   final List<User> _usersList = [];
-  User _currentUser = User('', '', DateTime.now(), '', '', '', '');
+  User _currentUser = User('', '', DateTime.now(), '', 'Vietnam', 'Beginner', '', '');
   bool _authenticated = false;
 
   bool get authenticated {
     return _authenticated;
+  }
+
+  User get currentUser {
+    return _currentUser;
   }
 
   void login() {
@@ -47,9 +52,18 @@ class UserProvider with ChangeNotifier {
   }
 
   void register(String email, String password, String fullName) {
-    User newUser = User(email, password, DateTime.now(), '', '', '', fullName);
+    User newUser = User(email, password, DateTime.now(), '', 'Vietnam', 'Beginner', '', fullName);
     _usersList.add(newUser);
     _currentUser = newUser;
+    notifyListeners();
+  }
+
+  void updateProfile(DateTime birthday, String phone, String country, String level, String imageUrl) {
+    _currentUser.birthday = birthday;
+    _currentUser.phone = phone;
+    _currentUser.country = country;
+    _currentUser.level = level;
+    _currentUser.imageUrl = imageUrl;
     notifyListeners();
   }
 }

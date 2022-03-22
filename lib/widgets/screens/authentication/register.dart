@@ -118,17 +118,16 @@ class _RegisterState extends State<Register> {
                 return;
               } else if (userData.isEmailExisted(emailController.text)) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text(
-                          'Email has already existed! Please check again!')),
+                  SnackBar(
+                      content: const Text(
+                          'Email has already existed! Please check again!'), backgroundColor: Theme.of(context).errorColor,),
                 );
               } else {
                 userData.register(emailController.text, passwordController.text,
                     fullNameController.text);
-                userData.login();
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Register Successfully!')),
+                  SnackBar(content: const Text('Register Successfully!'), backgroundColor: Theme.of(context).accentColor,),
                 );
               }
             },
