@@ -38,7 +38,7 @@ class _SettingsState extends State<Settings> {
                       child: CircleAvatar(
                         child: ClipOval(
                           child: userData.currentUser.imageUrl == '' ? Image.network(
-                            'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                            'https://media.istockphoto.com/photos/businessman-silhouette-as-avatar-or-default-profile-picture-picture-id476085198?k=20&m=476085198&s=612x612&w=0&h=8J3VgOZab_OiYoIuZfiMIvucFYB8vWYlKnSjKuKeYQM=',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,

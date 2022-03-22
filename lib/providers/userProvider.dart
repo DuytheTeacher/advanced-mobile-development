@@ -66,4 +66,13 @@ class UserProvider with ChangeNotifier {
     _currentUser.imageUrl = imageUrl;
     notifyListeners();
   }
+
+  String recoveryPassword(String email) {
+    bool checkExited = _usersList.any((element) => element.email == email);
+    if (checkExited) {
+      User returnedUser = _usersList.firstWhere((element) => element.email == email);
+      return returnedUser.password;
+    }
+    return '';
+  }
 }

@@ -1,4 +1,7 @@
+import 'package:advanced_mobile_dev/api/notification_api.dart';
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key, required this.title}) : super(key: key);
@@ -14,7 +17,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final String logoTitle = 'LET TURTOR';
 
   @override
+  void initState() {
+    super.initState();
+    NotificationApi.init();
+    listenNotifications();
+  }
+
+  void listenNotifications() {
+    NotificationApi.onNotifications.stream.listen(onClickedNotification);
+  }
+
+  void onClickedNotification(String? payload) {
+    Navigator.of(context).pushReplacementNamed('/');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserProvider>(context);
+
     // App Logo render
     _logo() {
       return Padding(
@@ -64,7 +84,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 fixedSize: const Size(300, 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
-            onPressed: () {},
+            onPressed: () {
+              final returnedPassword = userData.recoveryPassword(emailController.text);
+              String message = 'Can not find your email address. Please check again!';
+
+              if (returnedPassword.isNotEmpty) {
+                message = 'Your password is $returnedPassword . Please do not share with other people';
+              }
+              NotificationApi.showNotification(
+                title: 'Recovery password',
+                body: message,
+                payload: 'sarah.abs'
+              );
+            },
             child: const Text(
               'Send',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
