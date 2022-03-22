@@ -31,22 +31,19 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool validate(String email, String password) {
-    List<User> queryUser = _usersList.where((element) => element.email == email && element.password == password).toList();
-    if (queryUser.isNotEmpty) {
-      return false;
+  bool isExisted(String email, String password) {
+    bool checkExited = _usersList.any((element) => element.email == email && element.password == password);
+    if (checkExited) {
+      _currentUser = _usersList.firstWhere((element) => element.email == email && element.password == password);
+      notifyListeners();
+      return true;
     }
-    _currentUser = _usersList.firstWhere((element) => element.email == email && element.password == password);
-    notifyListeners();
-    return true;
+    return false;
   }
 
-  bool validateEmail(String email) {
-    List<User> queryUser = _usersList.where((element) => element.email == email).toList();
-    if (queryUser.isNotEmpty) {
-      return false;
-    }
-    return true;
+  bool isEmailExisted(String email) {
+    bool checkExisted = _usersList.any((element) => element.email == email);
+    return checkExisted;
   }
 
   void register(String email, String password, String fullName) {

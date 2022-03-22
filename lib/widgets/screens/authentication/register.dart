@@ -116,7 +116,7 @@ class _RegisterState extends State<Register> {
             onPressed: () {
               if (!_formKey.currentState!.validate()) {
                 return;
-              } else if (!userData.validateEmail(emailController.text)) {
+              } else if (userData.isEmailExisted(emailController.text)) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                       content: Text(

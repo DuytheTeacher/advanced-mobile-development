@@ -119,7 +119,7 @@ class _LoginState extends State<Login> {
             onPressed: () {
               if (!_formKey.currentState!.validate()) {
                 return;
-              } else if (!userData.validate(emailController.text, passwordController.text)){
+              } else if (!userData.isExisted(emailController.text, passwordController.text)) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Login Failed! Email or password is incorrect!')),
                 );
