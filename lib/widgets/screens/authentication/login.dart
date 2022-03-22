@@ -1,23 +1,30 @@
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key, required this.title, required this.login})
+  const Login({Key? key, required this.title})
       : super(key: key);
 
   final String title;
-  final Function login;
 
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  static const routeName = '/login';
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final String logoTitle = 'LET TURTOR';
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserProvider>(context);
+
     // App Logo render
     _logo() {
       return Padding(
@@ -42,25 +49,40 @@ class _LoginState extends State<Login> {
 
     // App login form render
     _loginForm() {
-      return Column(
-        children: <Widget>[
-          TextField(
-            decoration: const InputDecoration(
-                labelText: 'Email', hintText: 'example@email.com'),
-            controller: emailController,
-            enableSuggestions: false,
-            autocorrect: false,
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            decoration: const InputDecoration(
-                labelText: 'Password', hintText: '*********'),
-            controller: passwordController,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-          ),
-        ],
+      return Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Username can not be empty!';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(
+                  labelText: 'Email', hintText: 'example@email.com'),
+              controller: emailController,
+              enableSuggestions: false,
+              autocorrect: false,
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Password can not be empty!';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(
+                  labelText: 'Password', hintText: '*********'),
+              controller: passwordController,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+            ),
+          ],
+        ),
       );
     }
 
@@ -95,7 +117,18 @@ class _LoginState extends State<Login> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
             onPressed: () {
-              widget.login();
+              if (!_formKey.currentState!.validate()) {
+                return;
+              } else if (!userData.validate(emailController.text, passwordController.text)){
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Login Failed! Email or password is incorrect!')),
+                );
+              } else {
+                userData.login();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Login Successfully!')),
+                );
+              }
             },
             child: const Text(
               'Log In',
@@ -149,7 +182,7 @@ class _LoginState extends State<Login> {
             const Text('Don\'t have account? '),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/register');
+                Navigator.pushNamed(context, Register.routeName);
               },
               child: const Text(
                 'Register',
@@ -163,7 +196,7 @@ class _LoginState extends State<Login> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: Container(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

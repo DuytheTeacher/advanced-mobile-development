@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/courses.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/history.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/home-screen.dart';
@@ -7,12 +8,6 @@ import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
 
 class Tabbar extends StatefulWidget {
-  // const Tabbar({Key? key, this._logoutCallback}) : super(key: key);
-
-  const Tabbar(this.logoutCallback);
-
-  final Function logoutCallback;
-
   @override
   _TabbarState createState() => _TabbarState();
 }
@@ -36,8 +31,7 @@ class _TabbarState extends State<Tabbar> {
       {'page': const History(), 'title': 'History'},
       {
         'page': Settings(
-          seclectPage: _seclectPage,
-          logout: widget.logoutCallback,
+          seclectPage: _seclectPage
         ),
         'title': 'Settings'
       },
