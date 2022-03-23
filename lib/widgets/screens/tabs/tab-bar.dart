@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/widgets/common/tutor-list-only.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/courses.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/history.dart';
@@ -6,6 +7,7 @@ import 'package:advanced_mobile_dev/widgets/screens/tabs/schedule.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/settings.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 enum SearchOptions { name, country }
 
@@ -38,7 +40,6 @@ class _TabbarState extends State<Tabbar> {
     _popupMenu() {
       return PopupMenuButton(
         onSelected: (SearchOptions selectedValue) {
-          print(selectedValue);
           setState(() {
             if (selectedValue == SearchOptions.name) {
               _filter = SearchOptions.name;
@@ -49,11 +50,11 @@ class _TabbarState extends State<Tabbar> {
         },
         itemBuilder: (_) => const [
           PopupMenuItem(
-            child: Text('Filter by name'),
+            child: Text('Search by name'),
             value: SearchOptions.name,
           ),
           PopupMenuItem(
-            child: Text('Filter by country'),
+            child: Text('Search by country'),
             value: SearchOptions.country,
           ),
         ],
@@ -171,11 +172,17 @@ class TutorSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return TutorList(filter: filter, queryString: query);
+    final tutorProvider = Provider.of<TutorProvider>(context);
+    List<Tutor> list = tutorProvider.queryTutor(filter, 'all');
+
+    return TutorList(tutorsList: list,);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return TutorList(filter: filter, queryString: query);
+    final tutorProvider = Provider.of<TutorProvider>(context);
+    List<Tutor> list = tutorProvider.queryTutor(filter, query);
+
+    return TutorList(tutorsList: list,);
   }
 }

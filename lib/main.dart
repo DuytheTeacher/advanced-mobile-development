@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
               const Register(title: 'Register'),
           ForgotPassword.routeName: (BuildContext context) =>
               const ForgotPassword(title: 'Forgot Password'),
-          '/tutor-detail': (BuildContext context) =>
+          TutorDetail.routeName: (BuildContext context) =>
               const TutorDetail(title: 'Tutor'),
           Profile.routeName: (BuildContext context) => const Profile(title: 'Profile'),
           '/course-detail': (BuildContext context) =>

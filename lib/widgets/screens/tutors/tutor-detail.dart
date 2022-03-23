@@ -1,111 +1,61 @@
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class TutorDetail extends StatefulWidget {
   const TutorDetail({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  static String routeName = '/tutor-detail';
 
   @override
   _TutorDetailState createState() => _TutorDetailState();
 }
 
 class _TutorDetailState extends State<TutorDetail> {
-  List<String> languagesList = ['English', 'Vietnamese'];
-  List<String> specialitiesList = [
-    'English of business',
-    'Conversational',
-    'English for kids',
-    'IELTS',
-    'TOEIC'
-  ];
-  String interest =
-      'I loved the weather, the scenery and the laid-back lifestyle of the locals.';
-  String experience =
-      'I have more than 10 years of teaching english experience';
+  Tutor tutorDetail = Tutor(
+      id: '',
+      imageUrl: 'https://source.unsplash.com/random/?avatar/tutor',
+      name: '',
+      ratingStars: 0,
+      description: '',
+      country: '',
+      languages: [],
+      specialities: [],
+      interest: '',
+      exp: '',
+      comments: [],
+      isFavorite: false);
 
-  _generateStars(double iconSize) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-      ],
-    );
+  @override
+  initState() {
+    Future.delayed(Duration.zero, () {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
+      final tutorProvider = Provider.of<TutorProvider>(context, listen: false);
+      setState(() {
+        tutorDetail = tutorProvider.getTutorDetailById(args.id);
+      });
+    });
+
+    super.initState();
   }
 
-  _tutorInfo() {
+  _generateStars(int stars) {
     return Row(
-      children: <Widget>[
-        Expanded(
-            flex: 2,
-            child: CircleAvatar(
-              child: ClipOval(
-                child: Image.network(
-                  'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
+      children: List.generate(
+        5,
+        (index) => index + 1 <= stars
+            ? const Icon(
+                Icons.star,
+                color: Colors.yellow,
+              )
+            : const Icon(
+                Icons.star_border_outlined,
+                color: Colors.yellow,
               ),
-              radius: 30,
-            )),
-        Expanded(
-            flex: 4,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Text(
-                  'Tutor name',
-                  style: TextStyle(fontSize: 17),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
-                    'Teacher',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF616161)),
-                  ),
-                ),
-                Text('Viet Nam')
-              ],
-            )),
-        Expanded(
-            flex: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                _generateStars(24),
-                const Icon(
-                  Icons.favorite_outline,
-                  color: Colors.red,
-                )
-              ],
-            ))
-      ],
+      ),
     );
   }
 
@@ -148,11 +98,9 @@ class _TutorDetailState extends State<TutorDetail> {
   }
 
   _tutorDescription() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 15),
-      child: Text(
-          'I am passionate about running and fitness, I often compete in trail/mountain running events and I love pushing myself. I am training to one day take part in ultra-endurance events. I also enjoy watching rugby on the weekends, reading and watching podcasts on Youtube. My most memorable life experience would be living in and traveling around Southeast Asia.'),
-    );
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Text(tutorDetail.description));
   }
 
   _chipsSectionGenerator(String section, List<String> chips) {
@@ -213,7 +161,7 @@ class _TutorDetailState extends State<TutorDetail> {
     );
   }
 
-  _commentCard() {
+  _commentCard(Comment comment) {
     return Card(
       elevation: 5,
       child: Padding(
@@ -225,7 +173,7 @@ class _TutorDetailState extends State<TutorDetail> {
                 child: CircleAvatar(
                   child: ClipOval(
                     child: Image.network(
-                      'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                      comment.userImageUrl,
                       width: 35,
                       height: 35,
                       fit: BoxFit.cover,
@@ -244,31 +192,32 @@ class _TutorDetailState extends State<TutorDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const Text(
-                            'Student name',
-                            style: TextStyle(fontSize: 15),
+                          Text(
+                            comment.userName,
+                            style: const TextStyle(fontSize: 15),
                           ),
-                          _generateStars(18),
+                          _generateStars(comment.ratingStars),
                         ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          'He is the best teacher that I\'ve been ever leant! Thank you for all of your helpful, interesting, meaningful lessons. I wish you all the best on your career path.',
+                          comment.content,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
-                          style:
-                              TextStyle(fontSize: 12, color: Color(0xFF616161)),
+                          style: const TextStyle(
+                              fontSize: 12, color: Color(0xFF616161)),
                         ),
                       ),
                       SizedBox(
                         width: double.infinity,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
-                          children: const [
+                          children: [
                             Text(
-                              '20:20:20. 20/02/2022',
-                              style: TextStyle(
+                              DateFormat('dd/MM/yyyy, hh:mm')
+                                  .format(comment.date),
+                              style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.grey),
@@ -285,9 +234,9 @@ class _TutorDetailState extends State<TutorDetail> {
     );
   }
 
-  _listCommentsGenerator() {
+  _listCommentsGenerator(List<Comment> comments) {
     return Column(
-      children: List.generate(5, (index) => _commentCard()),
+      children: [...comments.map((element) => _commentCard(element)).toList()],
     );
   }
 
@@ -298,12 +247,12 @@ class _TutorDetailState extends State<TutorDetail> {
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Text(
-            'Rating and comments (5)',
+            'Rating and comments (${tutorDetail.comments.length})',
             style:
                 TextStyle(color: Theme.of(context).primaryColor, fontSize: 16),
           ),
         ),
-        _listCommentsGenerator()
+        _listCommentsGenerator(tutorDetail.comments)
       ],
     );
   }
@@ -447,6 +396,66 @@ class _TutorDetailState extends State<TutorDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final tutorData = Provider.of<TutorProvider>(context);
+
+    _tutorInfo() {
+      return Row(
+        children: <Widget>[
+          Expanded(
+              flex: 2,
+              child: CircleAvatar(
+                child: ClipOval(
+                  child: Image.network(
+                    tutorDetail.imageUrl,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                radius: 30,
+              )),
+          Expanded(
+              flex: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    tutorDetail.name,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Text(
+                      'Teacher',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF616161)),
+                    ),
+                  ),
+                  Text(tutorDetail.country)
+                ],
+              )),
+          Expanded(
+              flex: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  _generateStars(tutorDetail.ratingStars),
+                  IconButton(
+                    onPressed: () {
+                      tutorData.toggleFavorite(tutorDetail.id);
+                    },
+                    icon: Icon(
+                      tutorDetail.isFavorite ? Icons.favorite : Icons.favorite_outline,
+                      color: Colors.red,
+                    ),
+                  )
+                ],
+              ))
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: SingleChildScrollView(
@@ -473,10 +482,10 @@ class _TutorDetailState extends State<TutorDetail> {
               ),
               _actionsGroup(),
               _tutorDescription(),
-              _chipsSectionGenerator('Languages', languagesList),
-              _chipsSectionGenerator('Specialities', specialitiesList),
-              _textSectionGenerator('Interest', interest),
-              _textSectionGenerator('Teaching Experience', experience),
+              _chipsSectionGenerator('Languages', tutorDetail.languages),
+              _chipsSectionGenerator('Specialities', tutorDetail.specialities),
+              _textSectionGenerator('Interest', tutorDetail.interest),
+              _textSectionGenerator('Teaching Experience', tutorDetail.exp),
               _commentSectionGenerator()
             ]),
           ),
@@ -485,4 +494,10 @@ class _TutorDetailState extends State<TutorDetail> {
       resizeToAvoidBottomInset: false,
     );
   }
+}
+
+class TutorDetailArguments {
+  final String id;
+
+  TutorDetailArguments(this.id);
 }

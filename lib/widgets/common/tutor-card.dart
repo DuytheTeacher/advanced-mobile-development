@@ -1,4 +1,5 @@
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -89,7 +90,7 @@ class _TutorCardState extends State<TutorCard> {
               flex: 1,
               child: IconButton(
                 icon: widget.tutor.isFavorite == true ? const Icon(Icons.favorite) : const Icon(Icons.favorite_border),
-                color: Theme.of(context).primaryColor,
+                color: Colors.red,
                 onPressed: () {
                   final tutorData = Provider.of<TutorProvider>(context, listen: false);
                   tutorData.toggleFavorite(widget.tutor.id);
@@ -115,7 +116,7 @@ class _TutorCardState extends State<TutorCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/tutor-detail');
+        Navigator.pushNamed(context, TutorDetail.routeName, arguments: TutorDetailArguments(widget.tutor.id));
       },
       behavior: HitTestBehavior.translucent,
       child: Card(
