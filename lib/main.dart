@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => TutorProvider()),
       ],
       child: MaterialApp(
         title: 'LET TUTOR',
@@ -37,11 +39,11 @@ class MyApp extends StatelessWidget {
           // '/login': (BuildContext context) => Login(title: 'Login', login: _loginCallback,),
           Register.routeName: (BuildContext context) =>
               const Register(title: 'Register'),
-          '/forgot-password': (BuildContext context) =>
+          ForgotPassword.routeName: (BuildContext context) =>
               const ForgotPassword(title: 'Forgot Password'),
           '/tutor-detail': (BuildContext context) =>
               const TutorDetail(title: 'Tutor'),
-          '/profile': (BuildContext context) => const Profile(title: 'Profile'),
+          Profile.routeName: (BuildContext context) => const Profile(title: 'Profile'),
           '/course-detail': (BuildContext context) =>
               const CourseDetail(title: 'Course Detail'),
           '/video-call': (BuildContext context) =>

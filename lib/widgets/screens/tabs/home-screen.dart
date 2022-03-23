@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(8),
         itemCount: 3,
         itemBuilder: (BuildContext context, int index) {
-          return const Center(child: TutorCard());
+          return const Center();
         },
         separatorBuilder: (BuildContext context, int index) => const Divider(),
       ),

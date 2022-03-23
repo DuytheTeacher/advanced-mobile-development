@@ -7,6 +7,7 @@ class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  static String routeName = '/forgot-password';
 
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();

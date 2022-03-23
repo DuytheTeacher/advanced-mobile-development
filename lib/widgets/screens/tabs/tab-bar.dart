@@ -1,4 +1,4 @@
-import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:advanced_mobile_dev/widgets/common/tutor-list-only.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/courses.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/history.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/home-screen.dart';
@@ -7,6 +7,8 @@ import 'package:advanced_mobile_dev/widgets/screens/tabs/settings.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
 
+enum SearchOptions { name, country }
+
 class Tabbar extends StatefulWidget {
   @override
   _TabbarState createState() => _TabbarState();
@@ -14,6 +16,7 @@ class Tabbar extends StatefulWidget {
 
 class _TabbarState extends State<Tabbar> {
   int _selectedIndex = 0;
+  SearchOptions _filter = SearchOptions.name;
 
   void _seclectPage(int index) {
     setState(() {
@@ -29,13 +32,64 @@ class _TabbarState extends State<Tabbar> {
       {'page': const TurtorList(), 'title': 'Tutors'},
       {'page': const Courses(), 'title': 'Courses'},
       {'page': const History(), 'title': 'History'},
-      {
-        'page': Settings(
-          seclectPage: _seclectPage
-        ),
-        'title': 'Settings'
-      },
+      {'page': Settings(seclectPage: _seclectPage), 'title': 'Settings'},
     ];
+
+    _popupMenu() {
+      return PopupMenuButton(
+        onSelected: (SearchOptions selectedValue) {
+          print(selectedValue);
+          setState(() {
+            if (selectedValue == SearchOptions.name) {
+              _filter = SearchOptions.name;
+            } else {
+              _filter = SearchOptions.country;
+            }
+          });
+        },
+        itemBuilder: (_) => const [
+          PopupMenuItem(
+            child: Text('Filter by name'),
+            value: SearchOptions.name,
+          ),
+          PopupMenuItem(
+            child: Text('Filter by country'),
+            value: SearchOptions.country,
+          ),
+        ],
+        icon: Icon(
+          Icons.more_vert,
+          color: Theme.of(context).primaryColor,
+        ),
+      );
+    }
+
+    _filterRender() {
+      String filterText = '';
+      if (_filter == SearchOptions.name) {
+        filterText = 'Name';
+      } else if (_filter == SearchOptions.country) {
+        filterText = 'Country';
+      }
+      return Center(
+        child: RichText(
+          text: TextSpan(
+            children: [
+              WidgetSpan(
+                child: Icon(
+                  Icons.filter_alt_outlined,
+                  size: 20,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              TextSpan(
+                  text: filterText,
+                  style: TextStyle(color: Theme.of(context).primaryColor)),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -45,6 +99,26 @@ class _TabbarState extends State<Tabbar> {
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         automaticallyImplyLeading: false,
+        actions: [
+          _selectedIndex == 2
+              ? Row(
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          showSearch(
+                              context: context,
+                              delegate: TutorSearch(filter: _filter));
+                        },
+                        icon: Icon(
+                          Icons.search_sharp,
+                          color: Theme.of(context).primaryColor,
+                        )),
+                    _filterRender(),
+                    _popupMenu()
+                  ],
+                )
+              : Container()
+        ],
       ),
       body: _pages[_selectedIndex]['page'] as Widget,
       bottomNavigationBar: BottomNavigationBar(
@@ -66,5 +140,42 @@ class _TabbarState extends State<Tabbar> {
       ),
       resizeToAvoidBottomInset: false,
     );
+  }
+}
+
+class TutorSearch extends SearchDelegate<String> {
+  SearchOptions filter;
+
+  TutorSearch({required this.filter});
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            if (query.isEmpty) {
+              close(context, '');
+            } else {
+              query = '';
+            }
+          },
+        )
+      ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+      onPressed: () {
+        close(context, '');
+      },
+      icon: const Icon(Icons.arrow_back));
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return TutorList(filter: filter, queryString: query);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return TutorList(filter: filter, queryString: query);
   }
 }

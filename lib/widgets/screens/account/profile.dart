@@ -12,6 +12,7 @@ class Profile extends StatefulWidget {
   const Profile({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  static const routeName = '/profile';
 
   @override
   State<Profile> createState() => _ProfileState();

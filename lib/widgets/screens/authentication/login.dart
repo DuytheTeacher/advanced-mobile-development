@@ -1,4 +1,5 @@
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +95,7 @@ class _LoginState extends State<Login> {
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/forgot-password');
+                Navigator.pushNamed(context, ForgotPassword.routeName);
               },
               child: const Text(
                 'Forgot Password?',
