@@ -39,6 +39,7 @@ class _TutorListState extends State<TutorList> {
   @override
   void didUpdateWidget(covariant TutorList oldWidget) {
     tutors = widget.tutorsList;
+    _firstLoad();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -50,7 +51,7 @@ class _TutorListState extends State<TutorList> {
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
-      tutors = widget.tutorsList.sublist(0, _limit);
+      tutors = widget.tutorsList.sublist(0, widget.tutorsList.length > 10 ? 10 : widget.tutorsList.length);
       _isFirstLoadRunning = false;
     });
   }
@@ -70,7 +71,10 @@ class _TutorListState extends State<TutorList> {
       int ending = _limit * (_page + 1);
 
       setState(() {
-        if (ending <= total) {
+        if (total < _limit) {
+          _hasNextPage = false;
+          return;
+        } else if (ending <= total) {
           tutors.addAll(widget.tutorsList.sublist(_limit * _page, ending));
         } else {
           tutors.addAll(widget.tutorsList.sublist(_limit * _page));
