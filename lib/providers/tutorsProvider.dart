@@ -105,7 +105,7 @@ class TutorProvider with ChangeNotifier {
   void generateList() {
     const _uuid = Uuid();
     List<Tutor> genList = List<Tutor>.generate(
-      20,
+      24,
       (index) => Tutor(
           id: _uuid.v4(),
           imageUrl: 'https://source.unsplash.com/random/?avatar/tutor',

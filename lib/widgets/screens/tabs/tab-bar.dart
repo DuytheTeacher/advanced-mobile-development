@@ -173,9 +173,9 @@ class TutorSearch extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     final tutorProvider = Provider.of<TutorProvider>(context);
-    List<Tutor> list = tutorProvider.queryTutor(filter, 'all');
+    List<Tutor> list = tutorProvider.queryTutor(filter, query);
 
-    return TutorList(tutorsList: list,);
+    return SingleChildScrollView(child: TutorList(tutorsList: list,));
   }
 
   @override
@@ -183,6 +183,6 @@ class TutorSearch extends SearchDelegate<String> {
     final tutorProvider = Provider.of<TutorProvider>(context);
     List<Tutor> list = tutorProvider.queryTutor(filter, query);
 
-    return TutorList(tutorsList: list,);
+    return SingleChildScrollView(child: TutorList(tutorsList: list,),);
   }
 }

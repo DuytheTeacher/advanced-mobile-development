@@ -1,5 +1,7 @@
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/widgets/common/tutor-card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key, required this.seclectPage}) : super(key: key);
@@ -119,22 +121,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _listRecommendedTutors() {
-    return SizedBox(
-      height: 327,
-      child: ListView.separated(
-        padding: const EdgeInsets.all(8),
-        itemCount: 3,
-        itemBuilder: (BuildContext context, int index) {
-          return const Center();
-        },
-        separatorBuilder: (BuildContext context, int index) => const Divider(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final tutorProvider = Provider.of<TutorProvider>(context);
+
+    _listRecommendedTutors() {
+      return SizedBox(
+        height: 327,
+        child: ListView.separated(
+          padding: const EdgeInsets.all(8),
+          itemCount: tutorProvider.tutorsList.length,
+          itemBuilder: (BuildContext context, int index) {
+            Tutor tutor = tutorProvider.tutorsList[index];
+            return Center(
+                child: TutorCard(
+                  tutor: tutor,
+                ));
+          },
+          separatorBuilder: (BuildContext context, int index) => const Divider(),
+        ),
+      );
+    }
+
     return Column(
       children: <Widget>[
         _bookingSection(),
