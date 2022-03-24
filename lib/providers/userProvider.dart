@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 class User {
+  final String id;
   final String email;
   String password;
   DateTime birthday;
@@ -10,12 +12,12 @@ class User {
   String imageUrl;
   final String fullName;
 
-  User(this.email, this.password, this.birthday, this.phone, this.country, this.level, this.imageUrl, this.fullName);
+  User(this.id, this.email, this.password, this.birthday, this.phone, this.country, this.level, this.imageUrl, this.fullName);
 }
 
 class UserProvider with ChangeNotifier {
   final List<User> _usersList = [];
-  User _currentUser = User('', '', DateTime.now(), '', 'Vietnam', 'Beginner', '', '');
+  User _currentUser = User('', '', '', DateTime.now(), '', 'Vietnam', 'Beginner', '', '');
   bool _authenticated = false;
 
   bool get authenticated {
@@ -52,7 +54,7 @@ class UserProvider with ChangeNotifier {
   }
 
   void register(String email, String password, String fullName) {
-    User newUser = User(email, password, DateTime.now(), '', 'Vietnam', 'Beginner', '', fullName);
+    User newUser = User(const Uuid().v4(), email, password, DateTime.now(), '', 'Vietnam', 'Beginner', '', fullName);
     _usersList.add(newUser);
     _currentUser = newUser;
     notifyListeners();

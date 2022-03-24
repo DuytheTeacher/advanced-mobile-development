@@ -1,7 +1,10 @@
+import 'package:advanced_mobile_dev/providers/classProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class TutorDetail extends StatefulWidget {
   const TutorDetail({Key? key, required this.title}) : super(key: key);
@@ -27,6 +30,8 @@ class _TutorDetailState extends State<TutorDetail> {
       exp: '',
       comments: [],
       isFavorite: false);
+
+  DateTime pickedDate = DateTime.now();
 
   @override
   initState() {
@@ -263,61 +268,85 @@ class _TutorDetailState extends State<TutorDetail> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          children: List.generate(
-              7,
-              (index) => SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50))),
-                        onPressed: () {
-                          _showTimeBookingModal(ctx);
-                        },
-                        child: const Text('2020-03-02')),
-                  )),
+          children: List.generate(7, (index) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50))),
+                  onPressed: () {
+                    setState(() {
+                      pickedDate =
+                          DateTime.now().add(Duration(days: index, hours: 0));
+                    });
+                    _showTimeBookingModal(ctx);
+                  },
+                  child: Text(DateFormat('dd-MM-yyyy')
+                      .format(DateTime.now().add(Duration(days: index))))),
+            );
+          }),
         ),
       ),
     );
   }
 
   _listTimeBooking() {
-    // return Expanded(
-    //   child: GridView.count(
-    //     primary: false,
-    //     padding: const EdgeInsets.all(8),
-    //     crossAxisSpacing: 10,
-    //     mainAxisSpacing: 10,
-    //     crossAxisCount: 2,
-    //     children: List.generate(
-    //       4,
-    //       (index) => SizedBox(
-    //         width: double.infinity,
-    //         height: 50,
-    //         child: ElevatedButton(
-    //             style: ElevatedButton.styleFrom(
-    //                 shape: RoundedRectangleBorder(
-    //                     borderRadius: BorderRadius.circular(50))),
-    //             onPressed: () {},
-    //             child: const Text('2020-03-02')),
-    //       ),
-    //     ),
-    //   ),
-    // );
+    DateTime firstClass = DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day, 8, 0);
+    final classProvider = Provider.of<ClassProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    final args =
+        ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
+
+    List<Class> classesList =
+        classProvider.getClassByIds(args.id, userProvider.currentUser.id);
+
     return Expanded(
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          mainAxisExtent: 50,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: List.generate(4, (index) {
+              var session = DateTime(
+                  pickedDate.year,
+                  pickedDate.month,
+                  pickedDate.day,
+                  firstClass.add(Duration(hours: (index * 4))).hour,
+                  firstClass.add(Duration(hours: (index * 4))).minute);
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50))),
+                    onPressed: classesList.any((element) =>
+                                element.schedule.compareTo(session) == 0) ||
+                            session.isBefore(DateTime.now())
+                        ? null
+                        : () {
+                            Class newClass = Class(
+                                id: const Uuid().v4(),
+                                userId: userProvider.currentUser.id,
+                                tutorId: args.id,
+                                schedule: session);
+                            classProvider.addClass(newClass);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Book meeting successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.green,),
+                            );
+                          },
+                    child: Text(classesList.any((element) =>
+                            element.schedule.compareTo(session) == 0)
+                        ? 'Booked (${DateFormat('hh:mm a').format(firstClass.add(Duration(hours: (index * 4))))})'
+                        : DateFormat('hh:mm a').format(
+                            firstClass.add(Duration(hours: (index * 4)))))),
+              );
+            }),
+          ),
         ),
-        padding: const EdgeInsets.all(8),
-        itemCount: 6,
-        itemBuilder: (context, index) => ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50))),
-            onPressed: () {},
-            child: const Text('2020-03-02')),
       ),
     );
   }
@@ -446,7 +475,9 @@ class _TutorDetailState extends State<TutorDetail> {
                       tutorData.toggleFavorite(tutorDetail.id);
                     },
                     icon: Icon(
-                      tutorDetail.isFavorite ? Icons.favorite : Icons.favorite_outline,
+                      tutorDetail.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_outline,
                       color: Colors.red,
                     ),
                   )

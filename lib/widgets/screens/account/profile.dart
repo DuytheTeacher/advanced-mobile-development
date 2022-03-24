@@ -54,6 +54,7 @@ class _ProfileState extends State<Profile> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to pick image: $e'),
+            behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).errorColor,
           ),
         );
@@ -318,6 +319,7 @@ class _ProfileState extends State<Profile> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: const Text('Save profile successfully!'),
+                          behavior: SnackBarBehavior.floating,
                           backgroundColor: Theme.of(context).accentColor,
                         ),
                       );

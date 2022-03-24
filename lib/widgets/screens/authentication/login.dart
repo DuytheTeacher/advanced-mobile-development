@@ -122,12 +122,12 @@ class _LoginState extends State<Login> {
                 return;
               } else if (!userData.isExisted(emailController.text, passwordController.text)) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Login Failed! Email or password is incorrect!'), backgroundColor: Theme.of(context).errorColor,),
+                  SnackBar(content: const Text('Login Failed! Email or password is incorrect!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
                 );
               } else {
                 userData.login();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Login Successfully!'), backgroundColor: Theme.of(context).accentColor,),
+                  SnackBar(content: const Text('Login Successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).accentColor,),
                 );
               }
             },
