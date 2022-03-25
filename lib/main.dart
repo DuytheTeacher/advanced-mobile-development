@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
           Profile.routeName: (BuildContext context) => const Profile(title: 'Profile'),
           '/course-detail': (BuildContext context) =>
               const CourseDetail(title: 'Course Detail'),
-          '/video-call': (BuildContext context) =>
+          VideoCall.routeName: (BuildContext context) =>
               const VideoCall(title: 'Video Call'),
           '/become-tutor': (BuildContext context) =>
               const BecomeTutor(title: 'Become a Tutor'),

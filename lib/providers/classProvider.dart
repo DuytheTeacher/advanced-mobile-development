@@ -21,7 +21,16 @@ class ClassProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void cancelClass(String classId) {
+    _classes.removeWhere((element) => element.id == classId);
+    notifyListeners();
+  }
+
   List<Class> getClassByIds(String tutorId, String userId) {
     return [..._classes].where((element) => element.tutorId == tutorId && element.userId == userId).toList();
+  }
+
+  List<Class> getClassByUserId(String userId) {
+    return [..._classes].where((element) => element.userId == userId).toList();
   }
 }

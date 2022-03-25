@@ -48,7 +48,7 @@ class _TutorListState extends State<TutorList> {
       _isFirstLoadRunning = true;
     });
 
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     setState(() {
       tutors = widget.tutorsList.sublist(0, widget.tutorsList.length > 10 ? 10 : widget.tutorsList.length);
@@ -65,7 +65,7 @@ class _TutorListState extends State<TutorList> {
         _isLoadMoreRunning = true;
       });
 
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 500));
       _page += 1;
       int total = widget.tutorsList.length;
       int ending = _limit * (_page + 1);

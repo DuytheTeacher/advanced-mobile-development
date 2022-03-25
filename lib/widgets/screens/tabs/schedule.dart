@@ -1,4 +1,10 @@
+import 'package:advanced_mobile_dev/providers/classProvider.dart';
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class Schedule extends StatefulWidget {
   const Schedule({Key? key}) : super(key: key);
@@ -8,7 +14,9 @@ class Schedule extends StatefulWidget {
 }
 
 class _ScheduleState extends State<Schedule> {
-  _tutorSection() {
+  bool isLoading = false;
+
+  _tutorSection(Tutor tutorDetail) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
@@ -24,7 +32,7 @@ class _ScheduleState extends State<Schedule> {
                   child: CircleAvatar(
                     child: ClipOval(
                       child: Image.network(
-                        'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                        tutorDetail.imageUrl,
                         width: 60,
                         height: 60,
                         fit: BoxFit.cover,
@@ -37,18 +45,18 @@ class _ScheduleState extends State<Schedule> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
-                        'Tutor name',
-                        style: TextStyle(
+                        tutorDetail.name,
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5),
+                        padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          'Vietnamese',
-                          style:
-                              TextStyle(fontSize: 12, color: Color(0xFF616161)),
+                          tutorDetail.country,
+                          style: const TextStyle(
+                              fontSize: 12, color: Color(0xFF616161)),
                         ),
                       ),
                     ],
@@ -60,7 +68,7 @@ class _ScheduleState extends State<Schedule> {
     );
   }
 
-  _scheduleSection() {
+  _scheduleSection(Class currentClass) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Container(
@@ -74,11 +82,12 @@ class _ScheduleState extends State<Schedule> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
-                    'Lesson Time: 20:00 - 21:30',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'Lesson Time: ${DateFormat.jm().format(currentClass.schedule)} - ${DateFormat.jm().format(currentClass.schedule.add(const Duration(hours: 1, minutes: 30)))}',
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 SizedBox(
@@ -87,7 +96,23 @@ class _ScheduleState extends State<Schedule> {
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(width: 1, color: Colors.red),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        final classProvider = Provider.of<ClassProvider>(context, listen: false);
+                        classProvider.cancelClass(currentClass.id);
+                        await Future.delayed(const Duration(milliseconds: 500));
+
+                        setState(() {
+                          isLoading = false;
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: const Text('Cancel class Successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).accentColor,),
+                        );
+                      },
                       child: Row(
                         children: const <Widget>[
                           Icon(
@@ -95,7 +120,7 @@ class _ScheduleState extends State<Schedule> {
                             color: Colors.red,
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 5),
+                            padding: EdgeInsets.only(left: 5),
                             child: Text(
                               'Cancel',
                               style: TextStyle(color: Colors.red),
@@ -112,49 +137,66 @@ class _ScheduleState extends State<Schedule> {
     );
   }
 
-  _scheduleCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.grey[300], borderRadius: BorderRadius.circular(10.0)),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Text(
-                'Sun, 06 Mar 22',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
-              ),
-              const Text('1 lesson'),
-              _tutorSection(),
-              _scheduleSection(),
-              SizedBox(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {}, child: Text('Join meeting'))
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  _listSchedule() {
-    return Column(
-      children: List.generate(4, (index) => _scheduleCard()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final tutorProvider = Provider.of<TutorProvider>(context);
+    final classProvider = Provider.of<ClassProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+
+    final upcomingClasses =
+        classProvider.getClassByUserId(userProvider.currentUser.id);
+
+    upcomingClasses.sort((a, b) => a.schedule.compareTo(b.schedule));
+
+    _scheduleCard(Class currentClass) {
+      final tutorDetail =
+          tutorProvider.getTutorDetailById(currentClass.tutorId);
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(10.0)),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  DateFormat('E, d MMMM y').format(currentClass.schedule),
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 28),
+                ),
+                const Text('1 lesson'),
+                _tutorSection(tutorDetail),
+                _scheduleSection(currentClass),
+                SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, VideoCall.routeName, arguments: VideoCallArguments(currentClass.schedule));
+                          }, child: const Text('Join meeting'))
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    _listSchedule() {
+      return Column(
+        children: [
+          ...upcomingClasses.map((element) => _scheduleCard(element)).toList()
+        ],
+      );
+    }
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(15),
@@ -191,7 +233,7 @@ class _ScheduleState extends State<Schedule> {
                   ),
                 ),
               ),
-              _listSchedule(),
+              isLoading ? const Center(child: CircularProgressIndicator()) : _listSchedule(),
             ],
           ),
         ),
