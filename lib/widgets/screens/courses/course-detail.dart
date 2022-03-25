@@ -1,15 +1,41 @@
+import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:flutter/material.dart';
 
 class CourseDetail extends StatefulWidget {
   const CourseDetail({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  static String routeName = '/course-detail';
 
   @override
   State<CourseDetail> createState() => _CourseDetailState();
 }
 
 class _CourseDetailState extends State<CourseDetail> {
+  Course courseDetail = Course(
+      id: '',
+      imageUrl: '',
+      name: '',
+      description: '',
+      reason: '',
+      abilities: '',
+      exLevel: '',
+      contentUrl: '');
+
+  @override
+  initState() {
+    Future.delayed(Duration.zero, () {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as CourseDetailArgument;
+
+      setState(() {
+        courseDetail = args.course;
+      });
+    });
+
+    super.initState();
+  }
+
   _coursesCard() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
@@ -19,21 +45,22 @@ class _CourseDetailState extends State<CourseDetail> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Image.network(
-              'https://camblycurriculumicons.s3.amazonaws.com/5e0e8b212ac750e7dc9886ac?h=d41d8cd98f00b204e9800998ecf8427e',
+              courseDetail.imageUrl,
               fit: BoxFit.cover,
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Text(
-                'Life in the Internet Age',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                courseDetail.name,
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                'Let\'s discuss how technology is changing the way we live',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                courseDetail.description,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
             Padding(
@@ -71,9 +98,9 @@ class _CourseDetailState extends State<CourseDetail> {
             ],
           ),
         ),
-        const Text(
-          'Our world is rapidly changing thanks to new technology, and the vocabulary needed to discuss modern life is evolving almost daily. In this course you will learn the most up-to-date terminology from expertly crafted lessons as well from your native-speaking tutor.',
-          style: TextStyle(color: Colors.grey),
+        Text(
+          courseDetail.reason,
+          style: const TextStyle(color: Colors.grey),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -88,9 +115,9 @@ class _CourseDetailState extends State<CourseDetail> {
             ],
           ),
         ),
-        const Text(
-          'You will learn vocabulary related to timely topics like remote work, artificial intelligence, online privacy, and more. In addition to discussion questions, you will practice intermediate level speaking tasks such as using data to describe trends.',
-          style: TextStyle(color: Colors.grey),
+        Text(
+          courseDetail.abilities,
+          style: const TextStyle(color: Colors.grey),
         )
       ],
     );
@@ -115,11 +142,11 @@ class _CourseDetailState extends State<CourseDetail> {
                 Icons.group_add_outlined,
                 color: Theme.of(context).primaryColor,
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: Text('Intermediate',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(courseDetail.exLevel,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
               )
             ],
           ),
@@ -178,4 +205,10 @@ class _CourseDetailState extends State<CourseDetail> {
         )),
         resizeToAvoidBottomInset: false);
   }
+}
+
+class CourseDetailArgument {
+  final Course course;
+
+  CourseDetailArgument(this.course);
 }

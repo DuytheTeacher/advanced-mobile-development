@@ -1,4 +1,6 @@
+import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/widgets/common/courses-list.dart';
 import 'package:advanced_mobile_dev/widgets/common/tutor-list-only.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/courses.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/history.dart';
@@ -101,21 +103,23 @@ class _TabbarState extends State<Tabbar> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         automaticallyImplyLeading: false,
         actions: [
-          _selectedIndex == 2
+          _selectedIndex == 2 || _selectedIndex == 3
               ? Row(
                   children: [
                     IconButton(
                         onPressed: () {
                           showSearch(
                               context: context,
-                              delegate: TutorSearch(filter: _filter));
+                              delegate: _selectedIndex == 2
+                                  ? TutorSearch(filter: _filter)
+                                  : CourseSearch());
                         },
                         icon: Icon(
                           Icons.search_sharp,
                           color: Theme.of(context).primaryColor,
                         )),
-                    _filterRender(),
-                    _popupMenu()
+                    _selectedIndex != 3 ? _filterRender() : Container(),
+                    _selectedIndex != 3 ? _popupMenu() : Container()
                   ],
                 )
               : Container()
@@ -141,6 +145,53 @@ class _TabbarState extends State<Tabbar> {
       ),
       resizeToAvoidBottomInset: false,
     );
+  }
+}
+
+class CourseSearch extends SearchDelegate<String> {
+  CourseSearch();
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            if (query.isEmpty) {
+              close(context, '');
+            } else {
+              query = '';
+            }
+          },
+        )
+      ];
+
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+      onPressed: () {
+        close(context, '');
+      },
+      icon: const Icon(Icons.arrow_back));
+
+  @override
+  Widget buildResults(BuildContext context) {
+    final courseProvider = Provider.of<CourseProvider>(context);
+    List<Course> list = courseProvider.queryCourse(query);
+
+    return SingleChildScrollView(
+        child: CoursesList(
+      coursesList: list,
+    ));
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final courseProvider = Provider.of<CourseProvider>(context);
+    List<Course> list = courseProvider.queryCourse(query);
+
+    return SingleChildScrollView(
+        child: CoursesList(
+      coursesList: list,
+    ));
   }
 }
 
@@ -175,7 +226,10 @@ class TutorSearch extends SearchDelegate<String> {
     final tutorProvider = Provider.of<TutorProvider>(context);
     List<Tutor> list = tutorProvider.queryTutor(filter, query);
 
-    return SingleChildScrollView(child: TutorList(tutorsList: list,));
+    return SingleChildScrollView(
+        child: TutorList(
+      tutorsList: list,
+    ));
   }
 
   @override
@@ -183,6 +237,10 @@ class TutorSearch extends SearchDelegate<String> {
     final tutorProvider = Provider.of<TutorProvider>(context);
     List<Tutor> list = tutorProvider.queryTutor(filter, query);
 
-    return SingleChildScrollView(child: TutorList(tutorsList: list,),);
+    return SingleChildScrollView(
+      child: TutorList(
+        tutorsList: list,
+      ),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
+import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => TutorProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
+        ChangeNotifierProvider(create: (_) => CourseProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -47,7 +49,7 @@ class MyApp extends StatelessWidget {
           TutorDetail.routeName: (BuildContext context) =>
               const TutorDetail(title: 'Tutor'),
           Profile.routeName: (BuildContext context) => const Profile(title: 'Profile'),
-          '/course-detail': (BuildContext context) =>
+          CourseDetail.routeName: (BuildContext context) =>
               const CourseDetail(title: 'Course Detail'),
           VideoCall.routeName: (BuildContext context) =>
               const VideoCall(title: 'Video Call'),

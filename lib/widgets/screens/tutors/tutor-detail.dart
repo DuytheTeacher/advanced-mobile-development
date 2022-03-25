@@ -376,7 +376,11 @@ class _TutorDetailState extends State<TutorDetail> {
                             Navigator.pop(context);
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Book meeting successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.green,),
+                              const SnackBar(
+                                content: Text('Book meeting successfully!'),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.green,
+                              ),
                             );
                           },
                     child: Text(classesList.any((element) =>
@@ -537,7 +541,9 @@ class _TutorDetailState extends State<TutorDetail> {
             width: double.infinity,
             child: Column(children: <Widget>[
               _videoSection(),
-              const SizedBox(height: 30,),
+              const SizedBox(
+                height: 30,
+              ),
               _tutorInfo(),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
