@@ -46,6 +46,8 @@ class _TutorListState extends State<TutorList> {
   void _firstLoad() async {
     setState(() {
       _isFirstLoadRunning = true;
+      _hasNextPage = true;
+      _page = 0;
     });
 
     await Future.delayed(const Duration(milliseconds: 500));
