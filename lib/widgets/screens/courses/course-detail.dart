@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:advanced_mobile_dev/api/pdf_api.dart';
 import 'package:advanced_mobile_dev/providers/courseProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/courses/course-content.dart';
 import 'package:flutter/material.dart';
 
 class CourseDetail extends StatefulWidget {
@@ -66,13 +70,19 @@ class _CourseDetailState extends State<CourseDetail> {
             Padding(
               padding: const EdgeInsets.only(top: 20, bottom: 10, left: 10),
               child: ElevatedButton(
-                  onPressed: () {}, child: const Text('Discover')),
+                  onPressed: () async {
+                    final file = await PDFApi.loadNetwork(courseDetail.contentUrl);
+                    // Navigator.pushNamed(context, CourseContent.routeName);
+                    openPDF(context, file);
+                  }, child: const Text('Discover')),
             ),
           ],
         ),
       ),
     );
   }
+
+  void openPDF(BuildContext context, File file) => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CourseContent(file: file, course: courseDetail,)));
 
   _overviewSection() {
     return Column(

@@ -56,7 +56,7 @@ class CourseProvider with ChangeNotifier {
         abilities:
             'You\'ll practice giving strong answers in Part 1, with tips and tricks recommended by real IELTS examiners.',
         exLevel: 'Any Level',
-        contentUrl: 'http://www.africau.edu/images/default/sample.pdf',
+        contentUrl: 'https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf',
       ),
     );
     _courses = genList;

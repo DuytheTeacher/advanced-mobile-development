@@ -35,10 +35,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'LET TUTOR',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Colors.white,
-          accentColor: Colors.green
-        ),
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: Colors.white,
+            accentColor: Colors.green),
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
           // '/login': (BuildContext context) => Login(title: 'Login', login: _loginCallback,),
@@ -48,7 +47,8 @@ class MyApp extends StatelessWidget {
               const ForgotPassword(title: 'Forgot Password'),
           TutorDetail.routeName: (BuildContext context) =>
               const TutorDetail(title: 'Tutor'),
-          Profile.routeName: (BuildContext context) => const Profile(title: 'Profile'),
+          Profile.routeName: (BuildContext context) =>
+              const Profile(title: 'Profile'),
           CourseDetail.routeName: (BuildContext context) =>
               const CourseDetail(title: 'Course Detail'),
           VideoCall.routeName: (BuildContext context) =>

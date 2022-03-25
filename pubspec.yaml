@@ -47,6 +47,10 @@ dev_dependencies:
   image_picker: ^0.8.4+11
   uuid: 3.0.6
   video_player: ^2.3.0
+  flutter_pdfview: ^1.2.2
+  http: ^0.13.4
+  path_provider: ^2.0.9
+  file_picker: ^4.5.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
