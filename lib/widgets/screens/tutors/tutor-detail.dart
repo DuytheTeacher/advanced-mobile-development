@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:video_player/video_player.dart';
 
 class TutorDetail extends StatefulWidget {
   const TutorDetail({Key? key, required this.title}) : super(key: key);
@@ -33,8 +34,19 @@ class _TutorDetailState extends State<TutorDetail> {
 
   DateTime pickedDate = DateTime.now();
 
+  VideoPlayerController? _controller;
+  Future<void>? _initializeVideoPlayerFuture;
+
   @override
   initState() {
+    _controller = VideoPlayerController.network(
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    );
+
+    _initializeVideoPlayerFuture = _controller?.initialize();
+
+    _controller?.play();
+
     Future.delayed(Duration.zero, () {
       final args =
           ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
@@ -45,6 +57,35 @@ class _TutorDetailState extends State<TutorDetail> {
     });
 
     super.initState();
+  }
+
+  @override
+  dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  _videoSection() {
+    return FutureBuilder(
+      future: _initializeVideoPlayerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If the VideoPlayerController has finished initialization, use
+          // the data it provides to limit the aspect ratio of the video.
+          return AspectRatio(
+            aspectRatio: _controller!.value.aspectRatio,
+            // Use the VideoPlayer widget to display the video.
+            child: VideoPlayer(_controller!),
+          );
+        } else {
+          // If the VideoPlayerController is still initializing, show a
+          // loading spinner.
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
   }
 
   _generateStars(int stars) {
@@ -495,6 +536,8 @@ class _TutorDetailState extends State<TutorDetail> {
           child: SizedBox(
             width: double.infinity,
             child: Column(children: <Widget>[
+              _videoSection(),
+              const SizedBox(height: 30,),
               _tutorInfo(),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
