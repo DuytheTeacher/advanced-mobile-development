@@ -361,7 +361,15 @@ class _ScheduleState extends State<Schedule> {
             ),
             _isFirstLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _listSchedule(),
+                : classes.isEmpty
+                    ? const Center(
+                        child: Text(
+                        'There is no class!',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ))
+                    : _listSchedule(),
           ],
         ),
       ),

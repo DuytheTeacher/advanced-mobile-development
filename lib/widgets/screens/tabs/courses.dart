@@ -50,7 +50,7 @@ class _CoursesState extends State<Courses> {
                 ),
               ),
             ),
-            CoursesList(coursesList: coursesProvider.courses),
+            coursesProvider.courses.isEmpty ? const Center(child: Text('There is no course!', style: TextStyle(fontSize: 20),),) : CoursesList(coursesList: coursesProvider.courses),
           ],
         ),
       ),

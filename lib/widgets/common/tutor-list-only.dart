@@ -53,7 +53,8 @@ class _TutorListState extends State<TutorList> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     setState(() {
-      tutors = widget.tutorsList.sublist(0, widget.tutorsList.length > 10 ? 10 : widget.tutorsList.length);
+      tutors = widget.tutorsList.sublist(
+          0, widget.tutorsList.length > 10 ? 10 : widget.tutorsList.length);
       _isFirstLoadRunning = false;
     });
   }
@@ -101,24 +102,32 @@ class _TutorListState extends State<TutorList> {
             )
           : Column(
               children: [
-                SizedBox(
-                  height: _isLoadMoreRunning ? 427 : 483,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    controller: _controller,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: tutors.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      Tutor tutor = tutors[index];
-                      return Center(
-                          child: TutorCard(
-                        tutor: tutor,
-                      ));
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const Divider(),
-                  ),
-                ),
+                tutors.isEmpty
+                    ? const Center(
+                        child: Text(
+                        'There is no tutor!',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ))
+                    : SizedBox(
+                        height: _isLoadMoreRunning ? 427 : 483,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          controller: _controller,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: tutors.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Tutor tutor = tutors[index];
+                            return Center(
+                                child: TutorCard(
+                              tutor: tutor,
+                            ));
+                          },
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const Divider(),
+                        ),
+                      ),
                 if (_isLoadMoreRunning == true)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),

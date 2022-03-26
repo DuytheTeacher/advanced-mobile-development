@@ -296,7 +296,7 @@ class _HistoryState extends State<History> {
                 ),
               ),
             ),
-            _listHistory(),
+            histories.isEmpty ? const Center(child: Text('There is no history!', style: TextStyle(fontSize: 20),),) : _listHistory(),
           ],
         ),
       ),
