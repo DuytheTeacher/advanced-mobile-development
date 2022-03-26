@@ -182,6 +182,10 @@ class TutorProvider with ChangeNotifier {
     }).toList();
   }
 
+  List<Tutor> getFavorite() {
+    return [..._tutors].where((element) => element.isFavorite).toList();
+  }
+
   Tutor getTutorDetailById(String id) {
     return _tutors.singleWhere((element) => element.id == id);
   }

@@ -1,5 +1,7 @@
+// import 'package:advanced_mobile_dev/l10n/l10n.dart';
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
 import 'package:advanced_mobile_dev/providers/courseProvider.dart';
+import 'package:advanced_mobile_dev/providers/languageProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
@@ -9,11 +11,13 @@ import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart
 import 'package:advanced_mobile_dev/widgets/screens/courses/course-detail.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/become-tutor.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/favorite-tutors.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,33 +34,46 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TutorProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
         ChangeNotifierProvider(create: (_) => CourseProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'LET TUTOR',
-        theme: ThemeData(
-            primarySwatch: Colors.blue,
-            scaffoldBackgroundColor: Colors.white,
-            accentColor: Colors.green),
-        initialRoute: '/',
-        routes: <String, WidgetBuilder>{
-          // '/login': (BuildContext context) => Login(title: 'Login', login: _loginCallback,),
-          Register.routeName: (BuildContext context) =>
-              const Register(title: 'Register'),
-          ForgotPassword.routeName: (BuildContext context) =>
-              const ForgotPassword(title: 'Forgot Password'),
-          TutorDetail.routeName: (BuildContext context) =>
-              const TutorDetail(title: 'Tutor'),
-          Profile.routeName: (BuildContext context) =>
-              const Profile(title: 'Profile'),
-          CourseDetail.routeName: (BuildContext context) =>
-              const CourseDetail(title: 'Course Detail'),
-          VideoCall.routeName: (BuildContext context) =>
-              const VideoCall(title: 'Video Call'),
-          '/become-tutor': (BuildContext context) =>
-              const BecomeTutor(title: 'Become a Tutor'),
-        },
-        home: const MyHomePage(title: 'LetTutor'),
+      child: Builder(
+        builder: (context) {
+          final languageProvider = Provider.of<LanguageProvider>(context);
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'LET TUTOR',
+            theme: ThemeData(
+                primarySwatch: Colors.blue,
+                scaffoldBackgroundColor: Colors.white,
+                accentColor: Colors.green),
+            initialRoute: '/',
+            routes: <String, WidgetBuilder>{
+              // '/login': (BuildContext context) => Login(title: 'Login', login: _loginCallback,),
+              Register.routeName: (BuildContext context) =>
+                  Register(title: AppLocalizations.of(context)!.register),
+              ForgotPassword.routeName: (BuildContext context) => ForgotPassword(
+                  title: AppLocalizations.of(context)!.forgotPassword),
+              TutorDetail.routeName: (BuildContext context) =>
+                  TutorDetail(title: AppLocalizations.of(context)!.tutor),
+              Profile.routeName: (BuildContext context) =>
+                  Profile(title: AppLocalizations.of(context)!.profile),
+              CourseDetail.routeName: (BuildContext context) =>
+                  CourseDetail(title: AppLocalizations.of(context)!.courseDetail),
+              VideoCall.routeName: (BuildContext context) =>
+                  VideoCall(title: AppLocalizations.of(context)!.videoCall),
+              '/become-tutor': (BuildContext context) =>
+                  BecomeTutor(title: AppLocalizations.of(context)!.becomeATutor),
+              FavoriteTutor.routeName: (BuildContext context) => FavoriteTutor(
+                    title: AppLocalizations.of(context)!.favoriteTutors,
+                  )
+            },
+            home: const MyHomePage(title: 'LetTutor'),
+            locale: Locale(languageProvider.locale),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          );
+        }
       ),
     );
   }
@@ -80,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (userData.authenticated == true) {
         return Tabbar();
       } else {
-        return const Login(title: 'Login');
+        return Login(title: AppLocalizations.of(context)!.login);
       }
     }
 

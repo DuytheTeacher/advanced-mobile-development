@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class VideoCall extends StatefulWidget {
   const VideoCall({Key? key, required this.title}) : super(key: key);
@@ -67,7 +68,7 @@ class _VideoCallState extends State<VideoCall> with TickerProviderStateMixin {
       });
     }
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.videoCall)),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

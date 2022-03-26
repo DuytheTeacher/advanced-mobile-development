@@ -2,6 +2,8 @@ import 'package:advanced_mobile_dev/api/notification_api.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key, required this.title}) : super(key: key);
@@ -106,7 +108,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.forgotPassword)),
       body: Container(
         padding: const EdgeInsets.all(40),
         child: Column(

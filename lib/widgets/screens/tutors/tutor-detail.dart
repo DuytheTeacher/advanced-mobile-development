@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TutorDetail extends StatefulWidget {
   const TutorDetail({Key? key, required this.title}) : super(key: key);
@@ -533,7 +534,7 @@ class _TutorDetailState extends State<TutorDetail> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.tutor)),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),

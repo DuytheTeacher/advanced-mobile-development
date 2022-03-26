@@ -1,6 +1,7 @@
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key, required this.title}) : super(key: key);
@@ -197,7 +198,7 @@ class _RegisterState extends State<Register> {
 
     return Scaffold(
       appBar:
-          AppBar(title: Text(widget.title), automaticallyImplyLeading: false),
+          AppBar(title: Text(AppLocalizations.of(context)!.register), automaticallyImplyLeading: false),
       body: Container(
         padding: const EdgeInsets.all(40),
         child: Column(

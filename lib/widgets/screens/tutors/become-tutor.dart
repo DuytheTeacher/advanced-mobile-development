@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BecomeTutor extends StatefulWidget {
   const BecomeTutor({Key? key, required this.title}) : super(key: key);
@@ -369,7 +370,7 @@ class _BecomeTutorState extends State<BecomeTutor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.becomeATutor)),
       body: SingleChildScrollView(
           child: Column(
         children: <Widget>[_activeStep(), _renderScreen(), _changeStep()],

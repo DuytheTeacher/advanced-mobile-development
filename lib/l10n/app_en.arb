@@ -1,0 +1,26 @@
+{
+    "helloWorld": "Hello World!",
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "tutor": "Tutor",
+    "profile": "Profile",
+    "courseDetail": "Course Detail",
+    "videoCall": "Video Call",
+    "becomeATutor": "Become a Tutor",
+    "favoriteTutors": "Favorite Tutors",
+    "changeLanguage": "Change Language: sang {language}",
+    "@changeLanguage": {
+        "placeholders": {
+            "language": {
+                "type": "String"
+            }
+        }
+    },
+    "home": "Home",
+    "schedule": "Schedule",
+    "tutors": "Tutors",
+    "courses": "Courses",
+    "history": "History",
+    "settings": "Settings"
+}

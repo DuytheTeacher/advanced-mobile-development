@@ -1,0 +1,26 @@
+{
+    "helloWorld": "Xin chào thế giới",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "forgotPassword": "Quên mật khẩu",
+    "tutor": "Chi tiết Giảng viên",
+    "profile": "Thông tin tài khoản",
+    "courseDetail": "Chi tiết khóa học",
+    "videoCall": "Video Call",
+    "becomeATutor": "Đăng ký thành giảng viên",
+    "favoriteTutors": "Giảng viên yêu thích",
+    "changeLanguage": "Thay đổi ngôn ngữ: to {language}",
+    "@changeLanguage": {
+        "placeholders": {
+            "language": {
+                "type": "String"
+            }
+        }
+    },
+    "home": "Trang chủ",
+    "schedule": "Lịch học",
+    "tutors": "Danh sách Giảng viên",
+    "courses": "Danh sách khóa học",
+    "history": "Lịch sử lớp học",
+    "settings": "Cài đặt"
+}

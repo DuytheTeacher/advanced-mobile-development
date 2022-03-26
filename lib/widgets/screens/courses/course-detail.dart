@@ -4,6 +4,7 @@ import 'package:advanced_mobile_dev/api/pdf_api.dart';
 import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/courses/course-content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CourseDetail extends StatefulWidget {
   const CourseDetail({Key? key, required this.title}) : super(key: key);
@@ -200,7 +201,7 @@ class _CourseDetailState extends State<CourseDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.courseDetail)),
         body: SingleChildScrollView(
             child: Padding(
           padding: const EdgeInsets.all(15),

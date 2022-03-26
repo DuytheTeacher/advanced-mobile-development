@@ -1,8 +1,12 @@
 import 'dart:io';
 
+import 'package:advanced_mobile_dev/providers/languageProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/favorite-tutors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key, required this.seclectPage}) : super(key: key);
@@ -17,6 +21,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     _profileItem() {
       final imageFile = File(userData.currentUser.imageUrl);
@@ -27,7 +32,7 @@ class _SettingsState extends State<Settings> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/profile');
+              Navigator.pushNamed(context, Profile.routeName);
             },
             child: Padding(
               padding: const EdgeInsets.all(15),
@@ -124,18 +129,18 @@ class _SettingsState extends State<Settings> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              widget.seclectPage(3);
+              Navigator.pushNamed(context, FavoriteTutor.routeName);
             },
             child: Row(
               children: [
                 Icon(
-                  Icons.menu_book_sharp,
+                  Icons.favorite_border_outlined,
                   color: Theme.of(context).primaryColor,
                 ),
                 const Padding(
                   padding: EdgeInsets.only(left: 10),
                   child: Text(
-                    'Courses',
+                    'Favorite Tutors',
                     style: TextStyle(color: Colors.black),
                   ),
                 )
@@ -171,6 +176,40 @@ class _SettingsState extends State<Settings> {
                   child: Text(
                     'Become a tutor',
                     style: TextStyle(color: Colors.black),
+                  ),
+                )
+              ],
+            ),
+            style: ElevatedButton.styleFrom(
+                elevation: 3,
+                primary: Theme.of(context).scaffoldBackgroundColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50))),
+          ),
+        ),
+      );
+    }
+
+    _changeLanguageItem() {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              languageProvider.changeLocale();
+            },
+            child: Row(
+              children: [
+                Icon(
+                  Icons.work,
+                  color: Theme.of(context).primaryColor,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    AppLocalizations.of(context)!.changeLanguage(languageProvider.locale == 'vi' ? 'English' : 'Tiếng Việt'),
+                    style: const TextStyle(color: Colors.black),
                   ),
                 )
               ],
@@ -228,6 +267,7 @@ class _SettingsState extends State<Settings> {
             _changePasswordItem(),
             _coursesItem(),
             _becomeTutorItem(),
+            _changeLanguageItem(),
             _logoutItem()
           ],
         ),

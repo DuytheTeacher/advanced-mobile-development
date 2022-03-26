@@ -10,6 +10,7 @@ import 'package:advanced_mobile_dev/widgets/screens/tabs/settings.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum SearchOptions { name, country }
 
@@ -31,12 +32,12 @@ class _TabbarState extends State<Tabbar> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, Object>> _pages = [
-      {'page': HomeScreen(seclectPage: _seclectPage), 'title': 'Home'},
-      {'page': const Schedule(), 'title': 'Schedule'},
-      {'page': const TurtorList(), 'title': 'Tutors'},
-      {'page': const Courses(), 'title': 'Courses'},
-      {'page': const History(), 'title': 'History'},
-      {'page': Settings(seclectPage: _seclectPage), 'title': 'Settings'},
+      {'page': HomeScreen(seclectPage: _seclectPage), 'title': AppLocalizations.of(context)!.home},
+      {'page': const Schedule(), 'title': AppLocalizations.of(context)!.schedule},
+      {'page': const TurtorList(), 'title': AppLocalizations.of(context)!.tutors},
+      {'page': const Courses(), 'title': AppLocalizations.of(context)!.courses},
+      {'page': const History(), 'title': AppLocalizations.of(context)!.history},
+      {'page': Settings(seclectPage: _seclectPage), 'title': AppLocalizations.of(context)!.settings},
     ];
 
     _popupMenu() {
