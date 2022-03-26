@@ -43,6 +43,6 @@ class ClassProvider with ChangeNotifier {
   }
 
   List<Class> getHistoryByUserId(String userId) {
-    return [...classes].where((element) => element.schedule.isBefore(DateTime.now())).toList();
+    return [...classes].where((element) => element.schedule.add(Duration(minutes: 90)).isBefore(DateTime.now())).toList();
   }
 }
