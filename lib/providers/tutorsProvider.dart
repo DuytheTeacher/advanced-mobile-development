@@ -1,9 +1,11 @@
 import 'dart:math';
+import 'dart:convert';
 
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Tutor {
   String id;
@@ -16,7 +18,6 @@ class Tutor {
   List<String> specialities;
   String interest;
   String exp;
-  List<Comment> comments;
   bool isFavorite;
 
   Tutor(
@@ -30,8 +31,36 @@ class Tutor {
       required this.specialities,
       required this.interest,
       required this.exp,
-      required this.comments,
       required this.isFavorite});
+
+  Tutor.fromMap(Map map)
+      : id = map['id'],
+        imageUrl = map['imageUrl'],
+        name = map['name'],
+        ratingStars = map['ratingStars'],
+        description = map['description'],
+        country = map['country'],
+        languages = List<String>.from(map['languages']),
+        specialities = List<String>.from(map['specialities']),
+        interest = map['interest'],
+        exp = map['exp'],
+        isFavorite = map['isFavorite'];
+
+  Map toMap() {
+    return {
+      'id': id,
+      'imageUrl': imageUrl,
+      'name': name,
+      'ratingStars': ratingStars,
+      'description': description,
+      'country': country,
+      'languages': languages,
+      'specialities': specialities,
+      'interest': interest,
+      'exp': exp,
+      'isFavorite': isFavorite,
+    };
+  }
 }
 
 class Comment {
@@ -49,17 +78,58 @@ class Comment {
       required this.content,
       required this.ratingStars,
       required this.date});
+
+  Comment.fromMap(Map map)
+      : userImageUrl = map['userImageUrl'],
+        userName = map['userName'],
+        userId = map['userId'],
+        ratingStars = map['ratingStars'],
+        content = map['content'],
+        date = DateTime.tryParse(map['date']) ?? DateTime.now();
+
+  Map toMap() {
+    return {
+      'userImageUrl': userImageUrl,
+      'userName': userName,
+      'userId': userId,
+      'ratingStars': ratingStars,
+      'content': content,
+      'date': date.toIso8601String()
+    };
+  }
 }
 
 class TutorProvider with ChangeNotifier {
   List<Tutor> _tutors = [];
+  late SharedPreferences prefs;
 
   List<Tutor> get tutorsList {
     return [..._tutors];
   }
 
   TutorProvider() {
-    generateList();
+    setup();
+  }
+
+  void setup() async {
+    prefs = await SharedPreferences.getInstance();
+    await loadData();
+    if (_tutors.isEmpty) {
+      generateList();
+      await saveData();
+    }
+  }
+
+  saveData() async {
+    List<String> spList =
+    _tutors.map((item) => json.encode(item.toMap())).toList();
+    await prefs.setStringList('tutors', spList);
+  }
+
+  loadData() async {
+    List<String> spList = await prefs.getStringList('tutors') ?? [];
+    _tutors = spList.map((item) => Tutor.fromMap(json.decode(item))).toList();
+    notifyListeners();
   }
 
   String randomName() {
@@ -119,7 +189,6 @@ class TutorProvider with ChangeNotifier {
           interest:
               'I loved the weather, the scenery and the laid-back lifestyle of the locals.',
           exp: 'I have more than 10 years of teaching english experience',
-          comments: generateComments(),
           isFavorite: false),
     );
     _tutors = genList;
@@ -145,6 +214,7 @@ class TutorProvider with ChangeNotifier {
     int index = _tutors.indexWhere((element) => element.id == tutorId);
     _tutors[index].isFavorite = !_tutors[index].isFavorite;
     notifyListeners();
+    saveData();
   }
 
   List<Tutor> queryTutor(SearchOptions filter, String queryString) {

@@ -22,5 +22,21 @@
     "tutors": "Danh sách Giảng viên",
     "courses": "Danh sách khóa học",
     "history": "Lịch sử lớp học",
-    "settings": "Cài đặt"
+    "settings": "Cài đặt",
+    "recommendedTutors": "Giảng viên được đề xuất",
+    "seeAll": "Tất cả >",
+    "totalLessonTime": "Tổng thời gian tham gia lớp học là {inHours} giờ {inMinutes} phút",
+    "@totalLessonTime": {
+        "placeholders": {
+            "inHours": {
+                "type": "String"
+            },
+            "inMinutes": {
+                "type": "String"
+            }
+        }
+    },
+    "upcomingLesson": "Lớp học tiếp theo",
+    "enterLessonRoom": "Tham gia lớp học",
+    "thereIsNoUpcomingClass": "Hiện chưa có lớp học nào"
 }

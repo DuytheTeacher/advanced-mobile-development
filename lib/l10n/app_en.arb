@@ -22,5 +22,21 @@
     "tutors": "Tutors",
     "courses": "Courses",
     "history": "History",
-    "settings": "Settings"
+    "settings": "Settings",
+    "recommendedTutors": "Recommended Tutors",
+    "seeAll": "See all >",
+    "totalLessonTime": "Total lessons time is {inHours} hours {inMinutes} minutes",
+    "@totalLessonTime": {
+        "placeholders": {
+            "inHours": {
+                "type": "String"
+            },
+            "inMinutes": {
+                "type": "String"
+            }
+        }
+    },
+    "upcomingLesson": "Upcoming lesson",
+    "enterLessonRoom": "Enter lesson room",
+    "thereIsNoUpcomingClass": "There is no upcoming class"
 }

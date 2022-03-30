@@ -6,6 +6,7 @@ import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key, required this.seclectPage}) : super(key: key);
@@ -24,9 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          const Text(
-            'Recommended Tutors',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.recommendedTutors,
+            style: const TextStyle(
               fontSize: 16,
             ),
           ),
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
               widget.seclectPage(2);
             },
             child: Text(
-              'See all >',
+              AppLocalizations.of(context)!.seeAll,
               style: TextStyle(color: Theme.of(context).primaryColor),
             ),
           )
@@ -70,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Total lessons time is ${totalTime.inHours} hours ${totalTime.inMinutes % 60} minutes',
+                  AppLocalizations.of(context)!.totalLessonTime(totalTime.inHours.toString(), (totalTime.inMinutes % 60).toString()),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Text(
-                    'Upcoming lesson',
+                    AppLocalizations.of(context)!.upcomingLesson,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -121,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Theme.of(context).primaryColor,
                               ),
                               Text(
-                                'Enter lesson room',
+                                AppLocalizations.of(context)!.enterLessonRoom,
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: Theme.of(context).primaryColor),
@@ -137,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ],
-                  ) : Center(child: Text('There is no upcoming class', style: TextStyle(color: Theme.of(context).scaffoldBackgroundColor),)),
+                  ) : Center(child: Text(AppLocalizations.of(context)!.thereIsNoUpcomingClass, style: TextStyle(color: Theme.of(context).scaffoldBackgroundColor),)),
                 ),
               ],
             ),

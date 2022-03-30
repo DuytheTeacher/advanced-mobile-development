@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Class {
   final String id;
@@ -7,10 +10,47 @@ class Class {
   final DateTime schedule;
 
   Class({required this.id, required this.userId, required this.tutorId, required this.schedule});
+
+  Class.fromMap(Map map)
+      : id = map['id'],
+        userId = map['userId'],
+        schedule = DateTime.tryParse(map['schedule']) ?? DateTime.now(),
+        tutorId = map['tutorId'];
+
+  Map toMap() {
+    return {
+      'id': id,
+      'userId': userId,
+      'schedule': schedule.toIso8601String(),
+      'tutorId': tutorId
+    };
+  }
 }
 
 class ClassProvider with ChangeNotifier {
-  final List<Class> _classes = [];
+  List<Class> _classes = [];
+  late SharedPreferences prefs;
+
+  ClassProvider() {
+    setup();
+  }
+
+  void setup() async {
+    prefs = await SharedPreferences.getInstance();
+    loadData();
+  }
+
+  void saveData() async {
+    List<String> spList =
+    _classes.map((item) => json.encode(item.toMap())).toList();
+    await prefs.setStringList('classes', spList);
+  }
+
+  void loadData() async {
+    List<String> spList = await prefs.getStringList('classes') ?? [];
+    _classes = spList.isNotEmpty ? spList.map((item) => Class.fromMap(json.decode(item))).toList() : [];
+    notifyListeners();
+  }
 
   List<Class> get classes {
     return [..._classes];
@@ -19,11 +59,13 @@ class ClassProvider with ChangeNotifier {
   void addClass(Class newClass) {
     _classes.add(newClass);
     notifyListeners();
+    saveData();
   }
 
   void cancelClass(String classId) {
     _classes.removeWhere((element) => element.id == classId);
     notifyListeners();
+    saveData();
   }
 
   Class getClassById(String classId) {

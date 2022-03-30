@@ -37,7 +37,7 @@ class _CourseContentState extends State<CourseContent> {
                 ),
                 IconButton(
                     onPressed: () {
-                      _indexPage = _indexPage == 0 ? _pages : _indexPage - 1;
+                      _indexPage = _indexPage == 0 ? _pages - 1 : _indexPage - 1;
                       _controller.setPage(_indexPage);
                     },
                     icon: const Icon(

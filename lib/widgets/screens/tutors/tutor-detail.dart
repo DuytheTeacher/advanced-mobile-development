@@ -30,7 +30,6 @@ class _TutorDetailState extends State<TutorDetail> {
       specialities: [],
       interest: '',
       exp: '',
-      comments: [],
       isFavorite: false);
 
   DateTime pickedDate = DateTime.now();
@@ -288,18 +287,21 @@ class _TutorDetailState extends State<TutorDetail> {
   }
 
   _commentSectionGenerator() {
+    final tutorData = Provider.of<TutorProvider>(context);
+    List<Comment> comments = tutorData.generateComments();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Text(
-            'Rating and comments (${tutorDetail.comments.length})',
+            'Rating and comments (${comments.length})',
             style:
                 TextStyle(color: Theme.of(context).primaryColor, fontSize: 16),
           ),
         ),
-        _listCommentsGenerator(tutorDetail.comments)
+        _listCommentsGenerator(comments)
       ],
     );
   }
