@@ -304,9 +304,9 @@ class _ScheduleState extends State<Schedule> {
               shrinkWrap: true,
               controller: _controller,
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: classes.length,
+              itemCount: upcomingClasses.length,
               itemBuilder: (BuildContext context, int index) {
-                Class currentClass = classes[index];
+                Class currentClass = upcomingClasses[index];
                 return Center(child: _scheduleCard(currentClass));
               },
               separatorBuilder: (BuildContext context, int index) =>

@@ -17,6 +17,7 @@
             }
         }
     },
+    "changeTheme": "Change Theme",
     "home": "Home",
     "schedule": "Schedule",
     "tutors": "Tutors",

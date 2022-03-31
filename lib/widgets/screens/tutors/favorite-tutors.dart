@@ -25,7 +25,7 @@ class _FavoriteTutorState extends State<FavoriteTutor> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+          padding: const EdgeInsets.all(15),
           child: SizedBox(
             width: double.infinity,
             child: Column(

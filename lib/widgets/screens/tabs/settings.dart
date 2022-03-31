@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:advanced_mobile_dev/providers/languageProvider.dart';
+import 'package:advanced_mobile_dev/providers/themeProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/account/profile.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/favorite-tutors.dart';
@@ -22,6 +23,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     final userData = Provider.of<UserProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     _profileItem() {
       final imageFile = File(userData.currentUser.imageUrl);
@@ -202,13 +204,47 @@ class _SettingsState extends State<Settings> {
             child: Row(
               children: [
                 Icon(
-                  Icons.work,
+                  Icons.language,
                   color: Theme.of(context).primaryColor,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     AppLocalizations.of(context)!.changeLanguage(languageProvider.locale == 'vi' ? 'English' : 'Tiếng Việt'),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                )
+              ],
+            ),
+            style: ElevatedButton.styleFrom(
+                elevation: 3,
+                primary: Theme.of(context).scaffoldBackgroundColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50))),
+          ),
+        ),
+      );
+    }
+
+    _changeThemeItem() {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              themeProvider.changeTheme();
+            },
+            child: Row(
+              children: [
+                Icon(
+                  Icons.color_lens,
+                  color: Theme.of(context).primaryColor,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    AppLocalizations.of(context)!.changeTheme,
                     style: const TextStyle(color: Colors.black),
                   ),
                 )
@@ -268,6 +304,7 @@ class _SettingsState extends State<Settings> {
             _coursesItem(),
             _becomeTutorItem(),
             _changeLanguageItem(),
+            _changeThemeItem(),
             _logoutItem()
           ],
         ),
