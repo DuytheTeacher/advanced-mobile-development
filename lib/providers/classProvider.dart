@@ -81,10 +81,10 @@ class ClassProvider with ChangeNotifier {
   }
 
   List<Class> getClassByUserId(String userId) {
-    return [..._classes].where((element) => element.userId == userId && element.schedule.isAfter(DateTime.now())).toList();
+    return [..._classes].where((element) => element.userId == userId && element.schedule.add(const Duration(minutes: 90)).isAfter(DateTime.now())).toList();
   }
 
   List<Class> getHistoryByUserId(String userId) {
-    return [...classes].where((element) => element.schedule.add(Duration(minutes: 90)).isBefore(DateTime.now())).toList();
+    return [...classes].where((element) => element.schedule.add(const Duration(minutes: 90)).isBefore(DateTime.now())).toList();
   }
 }

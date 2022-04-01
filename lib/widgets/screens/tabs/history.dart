@@ -241,9 +241,9 @@ class _HistoryState extends State<History> {
               shrinkWrap: true,
               controller: _controller,
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: classes.length,
+              itemCount: histories.length,
               itemBuilder: (BuildContext context, int index) {
-                Class currentClass = classes[index];
+                Class currentClass = histories[index];
                 return Center(child: _historyCard(currentClass));
               },
               separatorBuilder: (BuildContext context, int index) =>
