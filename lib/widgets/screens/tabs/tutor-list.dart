@@ -1,6 +1,11 @@
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/widgets/common/tutor-list-only.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../common/tutor-card.dart';
+enum SortingOptions {
+  none, ascending, descending
+}
 
 class TurtorList extends StatefulWidget {
   const TurtorList({Key? key}) : super(key: key);
@@ -10,33 +15,28 @@ class TurtorList extends StatefulWidget {
 }
 
 class _TurtorListState extends State<TurtorList> {
-  final searchController = TextEditingController();
+  List<String> specialities = [
+    'English of business',
+    'TOEIC',
+    'IELTS',
+    'English for kids',
+    'Conversational'
+  ];
+  List<String> activeSpec = [];
+  SortingOptions sorting = SortingOptions.none;
 
-  _searchBar(TextEditingController controller) {
-    return SizedBox(
-      width: double.infinity,
-      child: TextField(
-        controller: controller,
-        autocorrect: false,
-        decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.search),
-          hintText: 'Search Tutors',
-          fillColor: Colors.grey[350],
-          filled: true,
-          contentPadding: const EdgeInsets.all(10.0),
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(
-              color: Color(0xFFD6D6D6),
-            ),
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: Color(0xFFD6D6D6)),
-          ),
-        ),
-      ),
-    );
+  void handleToggleSpec(String spec) {
+    bool checkExisted = activeSpec.contains(spec);
+
+    if (checkExisted) {
+      setState(() {
+        activeSpec.remove(spec);
+      });
+    } else {
+      setState(() {
+        activeSpec.add(spec);
+      });
+    }
   }
 
   _filterChips() {
@@ -47,47 +47,79 @@ class _TurtorListState extends State<TurtorList> {
         height: 40,
         child: ListView(
           scrollDirection: Axis.horizontal,
-          children: List.generate(
-              6,
-              (index) => Padding(
+          children: specialities
+              .map((spec) => Padding(
                     padding: const EdgeInsets.only(right: 5),
-                    child: Chip(
-                      backgroundColor: Theme.of(context).primaryColorLight,
-                      label: Text('Speciality',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 10)),
+                    child: GestureDetector(
+                      onTap: () {
+                        handleToggleSpec(spec);
+                      },
+                      child: Chip(
+                        backgroundColor: activeSpec.contains(spec)
+                            ? Theme.of(context).primaryColorDark
+                            : Theme.of(context).primaryColorLight,
+                        label: Text(spec,
+                            style: TextStyle(
+                                color: activeSpec.contains(spec)
+                                    ? Theme.of(context).scaffoldBackgroundColor
+                                    : Theme.of(context).primaryColor,
+                                fontSize: 10)),
+                      ),
                     ),
-                  )),
+                  ))
+              .toList(),
         ),
       ),
     );
   }
 
-  _listRecommendedTutors() {
-    return SizedBox(
-      height: 483.4,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: 3,
-        itemBuilder: (BuildContext context, int index) {
-          return const Center(child: TutorCard());
-        },
-        separatorBuilder: (BuildContext context, int index) => const Divider(),
-      ),
-    );
+  void handleToggleSorting() {
+    setState(() {
+      if (sorting == SortingOptions.none || sorting == SortingOptions.ascending) {
+        sorting = SortingOptions.descending;
+      } else {
+        sorting = SortingOptions.ascending;
+      }
+    });
+  }
+
+  _sortingSection() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              onPressed: () {
+                handleToggleSorting();
+              },
+              icon: sorting == SortingOptions.none ? const Icon(Icons.sort) : sorting == SortingOptions.ascending ? const Icon(Icons.arrow_upward) : const Icon(Icons.arrow_downward),
+              iconSize: 14,
+            ),
+            const Text(
+              'Sort by Rating',
+              style: TextStyle(fontSize: 12),
+            )
+          ],
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final tutorProvider = Provider.of<TutorProvider>(context);
+    List<Tutor> list = tutorProvider.queryTutorWithSpecAndSort(activeSpec, sorting);
+
     return SizedBox(
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         child: Column(children: <Widget>[
-          _searchBar(searchController),
           _filterChips(),
-          _listRecommendedTutors()
+          _sortingSection(),
+          TutorList(
+            tutorsList: list,
+          )
         ]),
       ),
     );

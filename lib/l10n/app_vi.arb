@@ -1,0 +1,43 @@
+{
+    "helloWorld": "Xin chào thế giới",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "forgotPassword": "Quên mật khẩu",
+    "tutor": "Chi tiết Giảng viên",
+    "profile": "Thông tin tài khoản",
+    "courseDetail": "Chi tiết khóa học",
+    "videoCall": "Video Call",
+    "becomeATutor": "Đăng ký thành giảng viên",
+    "favoriteTutors": "Giảng viên yêu thích",
+    "changeLanguage": "Thay đổi ngôn ngữ: to {language}",
+    "@changeLanguage": {
+        "placeholders": {
+            "language": {
+                "type": "String"
+            }
+        }
+    },
+    "changeTheme": "Thay đổi giao diện",
+    "home": "Trang chủ",
+    "schedule": "Lịch học",
+    "tutors": "Danh sách Giảng viên",
+    "courses": "Danh sách khóa học",
+    "history": "Lịch sử lớp học",
+    "settings": "Cài đặt",
+    "recommendedTutors": "Giảng viên được đề xuất",
+    "seeAll": "Tất cả >",
+    "totalLessonTime": "Tổng thời gian tham gia lớp học là {inHours} giờ {inMinutes} phút",
+    "@totalLessonTime": {
+        "placeholders": {
+            "inHours": {
+                "type": "String"
+            },
+            "inMinutes": {
+                "type": "String"
+            }
+        }
+    },
+    "upcomingLesson": "Lớp học tiếp theo",
+    "enterLessonRoom": "Tham gia lớp học",
+    "thereIsNoUpcomingClass": "Hiện chưa có lớp học nào"
+}

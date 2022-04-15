@@ -1,4 +1,11 @@
+import 'dart:io';
+
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class BecomeTutor extends StatefulWidget {
   const BecomeTutor({Key? key, required this.title}) : super(key: key);
@@ -13,6 +20,26 @@ class _BecomeTutorState extends State<BecomeTutor> {
   int currentStep = 1;
   int maxStep = 3;
   DateTime selectedDate = DateTime.now();
+  File? image;
+
+  Future pickImage() async {
+    try {
+      final image =
+      await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+      setState(() {
+        this.image = File(image.path);
+      });
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to pick image: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
+    }
+  }
 
   _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -73,12 +100,15 @@ class _BecomeTutorState extends State<BecomeTutor> {
             padding: const EdgeInsets.all(10),
             child: Column(
               children: <Widget>[
-                Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(color: Colors.grey[300]),
-                  child: const Center(
-                    child: Text('Upload your avatar...'),
+                GestureDetector(
+                  onTap: () => pickImage(),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(color: Colors.grey[300]),
+                    child: Center(
+                      child: image == null ? const Text('Upload your avatar') : Image.file(image!, width: 200, height: 200,),
+                    ),
                   ),
                 ),
                 Column(
@@ -369,7 +399,7 @@ class _BecomeTutorState extends State<BecomeTutor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.becomeATutor)),
       body: SingleChildScrollView(
           child: Column(
         children: <Widget>[_activeStep(), _renderScreen(), _changeStep()],

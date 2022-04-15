@@ -1,37 +1,32 @@
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class TutorCard extends StatefulWidget {
-  const TutorCard({Key? key}) : super(key: key);
+  TutorCard({Key? key, required this.tutor}) : super(key: key);
+
+  Tutor tutor;
 
   @override
   _TutorCardState createState() => _TutorCardState();
 }
 
 class _TutorCardState extends State<TutorCard> {
-  _generateStars() {
+  _generateStars(int stars) {
     return Row(
-      children: const [
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-        ),
-      ],
+      children: List.generate(
+        5,
+        (index) => index + 1 <= stars
+            ? const Icon(
+                Icons.star,
+                color: Colors.yellow,
+              )
+            : const Icon(
+                Icons.star_border_outlined,
+                color: Colors.yellow,
+              ),
+      ),
     );
   }
 
@@ -41,22 +36,21 @@ class _TutorCardState extends State<TutorCard> {
         width: double.infinity,
         child: ListView(
           scrollDirection: Axis.horizontal,
-          children: List.generate(
-              6,
-              (index) => Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Chip(
-                      backgroundColor: Theme.of(context).primaryColorLight,
-                      label: Text('BADGE',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 8)),
-                    ),
-                  )),
+          children: widget.tutor.specialities.map((element) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 5),
+              child: Chip(
+                backgroundColor: Theme.of(context).primaryColorLight,
+                label: Text(element,
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 8)),
+              ),
+            );
+          }).toList(),
         ));
   }
 
-  _tutorInfo() {
+  _tutorInfo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -66,7 +60,7 @@ class _TutorCardState extends State<TutorCard> {
               child: CircleAvatar(
                 child: ClipOval(
                   child: Image.network(
-                    'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                    widget.tutor.imageUrl,
                     width: 45,
                     height: 45,
                     fit: BoxFit.cover,
@@ -83,30 +77,36 @@ class _TutorCardState extends State<TutorCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text(
-                      'Tutor name',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    Text(
+                      widget.tutor.name,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    _generateStars(),
+                    _generateStars(widget.tutor.ratingStars),
                     _generateBadges()
                   ],
                 )),
           ),
           Expanded(
               flex: 1,
-              child: Icon(Icons.favorite_border,
-                  color: Theme.of(context).primaryColor)),
+              child: IconButton(
+                icon: widget.tutor.isFavorite == true ? const Icon(Icons.favorite) : const Icon(Icons.favorite_border),
+                color: Colors.red,
+                onPressed: () {
+                  final tutorData = Provider.of<TutorProvider>(context, listen: false);
+                  tutorData.toggleFavorite(widget.tutor.id);
+                },
+              )),
         ],
       ),
     );
   }
 
   _tutorDescription() {
-    return const Text(
-      'I am passionate about running and fitness, I often compete in trail/mountain running events and I love pushing myself. I am training to one day take part in ultra-endurance events. I also enjoy watching rugby on the weekends, reading and watching podcasts on Youtube. My most memorable life experience would be living in and traveling around Southeast Asia.',
+    return Text(
+      widget.tutor.description,
       overflow: TextOverflow.ellipsis,
       maxLines: 4,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 13,
       ),
     );
@@ -116,14 +116,15 @@ class _TutorCardState extends State<TutorCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/tutor-detail');
+        Navigator.pushNamed(context, TutorDetail.routeName, arguments: TutorDetailArguments(widget.tutor.id));
       },
+      behavior: HitTestBehavior.translucent,
       child: Card(
         elevation: 5,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
-            children: [_tutorInfo(), _tutorDescription()],
+            children: [_tutorInfo(context), _tutorDescription()],
           ),
         ),
       ),

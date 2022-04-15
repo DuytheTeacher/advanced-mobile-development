@@ -1,111 +1,107 @@
+import 'package:advanced_mobile_dev/providers/classProvider.dart';
+import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
+import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
+import 'package:video_player/video_player.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TutorDetail extends StatefulWidget {
   const TutorDetail({Key? key, required this.title}) : super(key: key);
 
   final String title;
+  static String routeName = '/tutor-detail';
 
   @override
   _TutorDetailState createState() => _TutorDetailState();
 }
 
 class _TutorDetailState extends State<TutorDetail> {
-  List<String> languagesList = ['English', 'Vietnamese'];
-  List<String> specialitiesList = [
-    'English of business',
-    'Conversational',
-    'English for kids',
-    'IELTS',
-    'TOEIC'
-  ];
-  String interest =
-      'I loved the weather, the scenery and the laid-back lifestyle of the locals.';
-  String experience =
-      'I have more than 10 years of teaching english experience';
+  Tutor tutorDetail = Tutor(
+      id: '',
+      imageUrl: 'https://source.unsplash.com/random/?avatar/tutor',
+      name: '',
+      ratingStars: 0,
+      description: '',
+      country: '',
+      languages: [],
+      specialities: [],
+      interest: '',
+      exp: '',
+      isFavorite: false);
 
-  _generateStars(double iconSize) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-        Icon(
-          Icons.star,
-          color: Colors.yellow,
-          size: iconSize,
-        ),
-      ],
+  DateTime pickedDate = DateTime.now();
+
+  VideoPlayerController? _controller;
+  Future<void>? _initializeVideoPlayerFuture;
+
+  @override
+  initState() {
+    _controller = VideoPlayerController.network(
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    );
+
+    _initializeVideoPlayerFuture = _controller?.initialize();
+
+    _controller?.play();
+
+    Future.delayed(Duration.zero, () {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
+      final tutorProvider = Provider.of<TutorProvider>(context, listen: false);
+      setState(() {
+        tutorDetail = tutorProvider.getTutorDetailById(args.id);
+      });
+    });
+
+    super.initState();
+  }
+
+  @override
+  dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  _videoSection() {
+    return FutureBuilder(
+      future: _initializeVideoPlayerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If the VideoPlayerController has finished initialization, use
+          // the data it provides to limit the aspect ratio of the video.
+          return AspectRatio(
+            aspectRatio: _controller!.value.aspectRatio,
+            // Use the VideoPlayer widget to display the video.
+            child: VideoPlayer(_controller!),
+          );
+        } else {
+          // If the VideoPlayerController is still initializing, show a
+          // loading spinner.
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 
-  _tutorInfo() {
+  _generateStars(int stars) {
     return Row(
-      children: <Widget>[
-        Expanded(
-            flex: 2,
-            child: CircleAvatar(
-              child: ClipOval(
-                child: Image.network(
-                  'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
+      children: List.generate(
+        5,
+        (index) => index + 1 <= stars
+            ? const Icon(
+                Icons.star,
+                color: Colors.yellow,
+              )
+            : const Icon(
+                Icons.star_border_outlined,
+                color: Colors.yellow,
               ),
-              radius: 30,
-            )),
-        Expanded(
-            flex: 4,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Text(
-                  'Tutor name',
-                  style: TextStyle(fontSize: 17),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
-                    'Teacher',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF616161)),
-                  ),
-                ),
-                Text('Viet Nam')
-              ],
-            )),
-        Expanded(
-            flex: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                _generateStars(24),
-                const Icon(
-                  Icons.favorite_outline,
-                  color: Colors.red,
-                )
-              ],
-            ))
-      ],
+      ),
     );
   }
 
@@ -148,11 +144,9 @@ class _TutorDetailState extends State<TutorDetail> {
   }
 
   _tutorDescription() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 15),
-      child: Text(
-          'I am passionate about running and fitness, I often compete in trail/mountain running events and I love pushing myself. I am training to one day take part in ultra-endurance events. I also enjoy watching rugby on the weekends, reading and watching podcasts on Youtube. My most memorable life experience would be living in and traveling around Southeast Asia.'),
-    );
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Text(tutorDetail.description));
   }
 
   _chipsSectionGenerator(String section, List<String> chips) {
@@ -213,7 +207,7 @@ class _TutorDetailState extends State<TutorDetail> {
     );
   }
 
-  _commentCard() {
+  _commentCard(Comment comment) {
     return Card(
       elevation: 5,
       child: Padding(
@@ -225,7 +219,7 @@ class _TutorDetailState extends State<TutorDetail> {
                 child: CircleAvatar(
                   child: ClipOval(
                     child: Image.network(
-                      'https://api.app.lettutor.com/avatar/4d54d3d7-d2a9-42e5-97a2-5ed38af5789aavatar1627913015850.00',
+                      comment.userImageUrl,
                       width: 35,
                       height: 35,
                       fit: BoxFit.cover,
@@ -244,31 +238,32 @@ class _TutorDetailState extends State<TutorDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const Text(
-                            'Student name',
-                            style: TextStyle(fontSize: 15),
+                          Text(
+                            comment.userName,
+                            style: const TextStyle(fontSize: 15),
                           ),
-                          _generateStars(18),
+                          _generateStars(comment.ratingStars),
                         ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          'He is the best teacher that I\'ve been ever leant! Thank you for all of your helpful, interesting, meaningful lessons. I wish you all the best on your career path.',
+                          comment.content,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
-                          style:
-                              TextStyle(fontSize: 12, color: Color(0xFF616161)),
+                          style: const TextStyle(
+                              fontSize: 12, color: Color(0xFF616161)),
                         ),
                       ),
                       SizedBox(
                         width: double.infinity,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
-                          children: const [
+                          children: [
                             Text(
-                              '20:20:20. 20/02/2022',
-                              style: TextStyle(
+                              DateFormat('dd/MM/yyyy, hh:mm')
+                                  .format(comment.date),
+                              style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.grey),
@@ -285,25 +280,28 @@ class _TutorDetailState extends State<TutorDetail> {
     );
   }
 
-  _listCommentsGenerator() {
+  _listCommentsGenerator(List<Comment> comments) {
     return Column(
-      children: List.generate(5, (index) => _commentCard()),
+      children: [...comments.map((element) => _commentCard(element)).toList()],
     );
   }
 
   _commentSectionGenerator() {
+    final tutorData = Provider.of<TutorProvider>(context);
+    List<Comment> comments = tutorData.generateComments();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Text(
-            'Rating and comments (5)',
+            'Rating and comments (${comments.length})',
             style:
                 TextStyle(color: Theme.of(context).primaryColor, fontSize: 16),
           ),
         ),
-        _listCommentsGenerator()
+        _listCommentsGenerator(comments)
       ],
     );
   }
@@ -314,61 +312,89 @@ class _TutorDetailState extends State<TutorDetail> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          children: List.generate(
-              7,
-              (index) => SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50))),
-                        onPressed: () {
-                          _showTimeBookingModal(ctx);
-                        },
-                        child: const Text('2020-03-02')),
-                  )),
+          children: List.generate(7, (index) {
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50))),
+                  onPressed: () {
+                    setState(() {
+                      pickedDate =
+                          DateTime.now().add(Duration(days: index, hours: 0));
+                    });
+                    _showTimeBookingModal(ctx);
+                  },
+                  child: Text(DateFormat('dd-MM-yyyy')
+                      .format(DateTime.now().add(Duration(days: index))))),
+            );
+          }),
         ),
       ),
     );
   }
 
   _listTimeBooking() {
-    // return Expanded(
-    //   child: GridView.count(
-    //     primary: false,
-    //     padding: const EdgeInsets.all(8),
-    //     crossAxisSpacing: 10,
-    //     mainAxisSpacing: 10,
-    //     crossAxisCount: 2,
-    //     children: List.generate(
-    //       4,
-    //       (index) => SizedBox(
-    //         width: double.infinity,
-    //         height: 50,
-    //         child: ElevatedButton(
-    //             style: ElevatedButton.styleFrom(
-    //                 shape: RoundedRectangleBorder(
-    //                     borderRadius: BorderRadius.circular(50))),
-    //             onPressed: () {},
-    //             child: const Text('2020-03-02')),
-    //       ),
-    //     ),
-    //   ),
-    // );
+    DateTime firstClass = DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day, 8, 0);
+    final classProvider = Provider.of<ClassProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
+    final args =
+        ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
+
+    List<Class> classesList =
+        classProvider.getClassByIds(args.id, userProvider.currentUser.id);
+
     return Expanded(
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          mainAxisExtent: 50,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: List.generate(4, (index) {
+              var session = DateTime(
+                  pickedDate.year,
+                  pickedDate.month,
+                  pickedDate.day,
+                  firstClass.add(Duration(hours: (index * 4))).hour,
+                  firstClass.add(Duration(hours: (index * 4))).minute);
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50))),
+                    onPressed: classesList.any((element) =>
+                                element.schedule.compareTo(session) == 0) ||
+                            session.isBefore(DateTime.now())
+                        ? null
+                        : () {
+                            Class newClass = Class(
+                                id: const Uuid().v4(),
+                                userId: userProvider.currentUser.id,
+                                tutorId: args.id,
+                                schedule: session);
+                            classProvider.addClass(newClass);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Book meeting successfully!'),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
+                    child: Text(classesList.any((element) =>
+                            element.schedule.compareTo(session) == 0)
+                        ? 'Booked (${DateFormat('hh:mm a').format(firstClass.add(Duration(hours: (index * 4))))})'
+                        : DateFormat('hh:mm a').format(
+                            firstClass.add(Duration(hours: (index * 4)))))),
+              );
+            }),
+          ),
         ),
-        padding: const EdgeInsets.all(8),
-        itemCount: 6,
-        itemBuilder: (context, index) => ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50))),
-            onPressed: () {},
-            child: const Text('2020-03-02')),
       ),
     );
   }
@@ -447,14 +473,80 @@ class _TutorDetailState extends State<TutorDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final tutorData = Provider.of<TutorProvider>(context);
+
+    _tutorInfo() {
+      return Row(
+        children: <Widget>[
+          Expanded(
+              flex: 2,
+              child: CircleAvatar(
+                child: ClipOval(
+                  child: Image.network(
+                    tutorDetail.imageUrl,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                radius: 30,
+              )),
+          Expanded(
+              flex: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    tutorDetail.name,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Text(
+                      'Teacher',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF616161)),
+                    ),
+                  ),
+                  Text(tutorDetail.country)
+                ],
+              )),
+          Expanded(
+              flex: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  _generateStars(tutorDetail.ratingStars),
+                  IconButton(
+                    onPressed: () {
+                      tutorData.toggleFavorite(tutorDetail.id);
+                    },
+                    icon: Icon(
+                      tutorDetail.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_outline,
+                      color: Colors.red,
+                    ),
+                  )
+                ],
+              ))
+        ],
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.tutor)),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: SizedBox(
             width: double.infinity,
             child: Column(children: <Widget>[
+              _videoSection(),
+              const SizedBox(
+                height: 30,
+              ),
               _tutorInfo(),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
@@ -473,10 +565,10 @@ class _TutorDetailState extends State<TutorDetail> {
               ),
               _actionsGroup(),
               _tutorDescription(),
-              _chipsSectionGenerator('Languages', languagesList),
-              _chipsSectionGenerator('Specialities', specialitiesList),
-              _textSectionGenerator('Interest', interest),
-              _textSectionGenerator('Teaching Experience', experience),
+              _chipsSectionGenerator('Languages', tutorDetail.languages),
+              _chipsSectionGenerator('Specialities', tutorDetail.specialities),
+              _textSectionGenerator('Interest', tutorDetail.interest),
+              _textSectionGenerator('Teaching Experience', tutorDetail.exp),
               _commentSectionGenerator()
             ]),
           ),
@@ -485,4 +577,10 @@ class _TutorDetailState extends State<TutorDetail> {
       resizeToAvoidBottomInset: false,
     );
   }
+}
+
+class TutorDetailArguments {
+  final String id;
+
+  TutorDetailArguments(this.id);
 }
