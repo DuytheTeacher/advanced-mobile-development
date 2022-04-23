@@ -45,7 +45,7 @@ class _HistoryState extends State<History> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     final allClasses = Provider.of<ClassProvider>(context, listen: false)
-        .getHistoryByUserId(userProvider.currentUser.id);
+        .getHistoryByUserId(userProvider.currentUser?.id);
     classes = allClasses.sublist(
         0, allClasses.length > _limit ? _limit : allClasses.length);
     await Future.delayed(const Duration(milliseconds: 500));
@@ -197,7 +197,7 @@ class _HistoryState extends State<History> {
     final userProvider = Provider.of<UserProvider>(context);
 
     final histories =
-        classProvider.getHistoryByUserId(userProvider.currentUser.id);
+        classProvider.getHistoryByUserId(userProvider.currentUser?.id);
 
     histories.sort((a, b) => a.schedule.compareTo(b.schedule));
 

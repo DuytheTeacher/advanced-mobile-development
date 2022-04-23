@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
 import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:advanced_mobile_dev/providers/languageProvider.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CourseProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        Provider(create: (ref) => Api())
       ],
       child: Builder(builder: (context) {
         final languageProvider = Provider.of<LanguageProvider>(context);

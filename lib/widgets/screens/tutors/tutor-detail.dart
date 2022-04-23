@@ -344,7 +344,7 @@ class _TutorDetailState extends State<TutorDetail> {
         ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
 
     List<Class> classesList =
-        classProvider.getClassByIds(args.id, userProvider.currentUser.id);
+        classProvider.getClassByIds(args.id, userProvider.currentUser?.id);
 
     return Expanded(
       child: SizedBox(
@@ -372,7 +372,7 @@ class _TutorDetailState extends State<TutorDetail> {
                         : () {
                             Class newClass = Class(
                                 id: const Uuid().v4(),
-                                userId: userProvider.currentUser.id,
+                                userId: userProvider.currentUser?.id,
                                 tutorId: args.id,
                                 schedule: session);
                             classProvider.addClass(newClass);

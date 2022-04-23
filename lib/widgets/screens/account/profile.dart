@@ -30,11 +30,11 @@ class _ProfileState extends State<Profile> {
   void initState() {
     final userData = Provider.of<UserProvider>(context, listen: false);
     setState(() {
-      _selectedDate = userData.currentUser.birthday;
-      _phoneController.text = userData.currentUser.phone;
-      _countryController = userData.currentUser.country;
-      _levelController = userData.currentUser.level;
-      _imageUrl = userData.currentUser.imageUrl;
+      _selectedDate = DateFormat("yyyy-MM-dd").parse(userData.currentUser?.birthday);
+      _phoneController.text = userData.currentUser?.phone;
+      _countryController = userData.currentUser?.country;
+      // _levelController = userData.currentUser?.level;
+      _imageUrl = userData.currentUser?.avatar;
     });
     super.initState();
   }
@@ -223,7 +223,7 @@ class _ProfileState extends State<Profile> {
                     borderSide: BorderSide(color: Color(0xFFD6D6D6)),
                   ),
                 ),
-                items: <String>['Vietnam', 'US', 'UK'].map((String value) {
+                items: <String>['VN', 'US', 'UK'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -300,7 +300,7 @@ class _ProfileState extends State<Profile> {
           child: Column(
             children: <Widget>[
               _infoSection(
-                  userData.currentUser.fullName, userData.currentUser.email),
+                  userData.currentUser?.name, userData.currentUser?.email),
               _birthdaySection(context),
               _phoneSection(_phoneController),
               _countrySection(),

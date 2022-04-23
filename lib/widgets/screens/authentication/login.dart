@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/forgot-password.dart';
 import 'package:advanced_mobile_dev/widgets/screens/authentication/register.dart';
@@ -21,6 +22,8 @@ class _LoginState extends State<Login> {
   final passwordController = TextEditingController();
   final String logoTitle = 'LET TURTOR';
   final _formKey = GlobalKey<FormState>();
+
+  final api = Api().api;
 
   @override
   Widget build(BuildContext context) {
@@ -117,18 +120,20 @@ class _LoginState extends State<Login> {
                 fixedSize: const Size(300, 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
-            onPressed: () {
+            onPressed: () async {
               if (!_formKey.currentState!.validate()) {
                 return;
-              } else if (!userData.isExisted(emailController.text, passwordController.text)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Login Failed! Email or password is incorrect!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
-                );
               } else {
-                userData.login();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Login Successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).accentColor,),
-                );
+                await userData.login(emailController.text, passwordController.text);
+                if (!userData.authenticated) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(userData.errorMessage), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: const Text('Login Successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).accentColor,),
+                  );
+                }
               }
             },
             child: const Text(

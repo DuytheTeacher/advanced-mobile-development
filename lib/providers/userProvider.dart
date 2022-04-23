@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:advanced_mobile_dev/api/api.dart';
+import 'package:advanced_mobile_dev/models/user-model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -45,9 +48,12 @@ class User {
 
 class UserProvider with ChangeNotifier {
   List<User> _usersList = [];
-  User _currentUser = User('', '', '', DateTime.now(), '', 'Vietnam', 'Beginner', '', '');
+  UserModel? userModel;
+  UserModel? _currentUser;
   bool _authenticated = false;
   late SharedPreferences prefs;
+  var api = Api().api;
+  String _errorMessage = '';
 
   UserProvider() {
     setup();
@@ -62,7 +68,7 @@ class UserProvider with ChangeNotifier {
     List<String> spList =
     _usersList.map((item) => json.encode(item.toMap())).toList();
     await prefs.setStringList('users', spList);
-    await prefs.setString('currentUser', json.encode(_currentUser.toMap()));
+    await prefs.setString('currentUser', json.encode(_currentUser?.toJson()));
     await prefs.setString('authenticated', _authenticated.toString());
   }
 
@@ -71,26 +77,48 @@ class UserProvider with ChangeNotifier {
     String? currentUserFromPrefs = await prefs.getString('currentUser');
     _usersList = spList.map((item) => User.fromMap(json.decode(item))).toList();
     _authenticated = await prefs.getString('authenticated') == 'true' ? true : false;
-    _currentUser = _authenticated ? User.fromMap(json.decode(currentUserFromPrefs!)) : User('', '', '', DateTime.now(), '', 'Vietnam', 'Beginner', '', '');
+    // _currentUser = _authenticated ? User.fromMap(json.decode(currentUserFromPrefs!)) : User('', '', '', DateTime.now(), '', 'Vietnam', 'Beginner', '', '');
     notifyListeners();
   }
+
+  String get errorMessage {
+    return _errorMessage;
+}
 
   bool get authenticated {
     return _authenticated;
   }
 
-  User get currentUser {
+  UserModel? get currentUser {
     return _currentUser;
   }
 
-  void login() {
-    _authenticated = true;
-    saveData();
+  Future<void> login (email, password) async {
+    try {
+      var resp = await api.post(
+          '/auth/login', data: {"email": email, "password": password});
+      _currentUser = UserModel.fromJson(resp.data['user']);
+      Map<String, dynamic> token = {'accessToken': resp.data['tokens']['access']['token'], 'refreshToken': resp.data['tokens']['refresh']['token']};
+      prefs.setString('auth', token.toString());
+      prefs.setString('currentUser', resp.data['user'].toString());
+      _authenticated = true;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        _errorMessage = e.response?.data['message'];
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+      _authenticated = false;
+    }
+    // _authenticated = true;
+    // saveData();
     notifyListeners();
   }
 
   void logout() {
     _authenticated = false;
+    prefs.clear();
     saveData();
     notifyListeners();
   }
@@ -98,7 +126,7 @@ class UserProvider with ChangeNotifier {
   bool isExisted(String email, String password) {
     bool checkExited = _usersList.any((element) => element.email == email && element.password == password);
     if (checkExited) {
-      _currentUser = _usersList.firstWhere((element) => element.email == email && element.password == password);
+      // _currentUser = _usersList.firstWhere((element) => element.email == email && element.password == password);
       saveData();
       notifyListeners();
       return true;
@@ -114,17 +142,17 @@ class UserProvider with ChangeNotifier {
   void register(String email, String password, String fullName) {
     User newUser = User(const Uuid().v4(), email, password, DateTime.now(), '', 'Vietnam', 'Beginner', '', fullName);
     _usersList.add(newUser);
-    _currentUser = newUser;
+    // _currentUser = newUser;
     saveData();
     notifyListeners();
   }
 
   void updateProfile(DateTime birthday, String phone, String country, String level, String imageUrl) {
-    _currentUser.birthday = birthday;
-    _currentUser.phone = phone;
-    _currentUser.country = country;
-    _currentUser.level = level;
-    _currentUser.imageUrl = imageUrl;
+    // _currentUser.birthday = birthday;
+    // _currentUser.phone = phone;
+    // _currentUser.country = country;
+    // _currentUser.level = level;
+    // _currentUser.imageUrl = imageUrl;
     saveData();
     notifyListeners();
   }

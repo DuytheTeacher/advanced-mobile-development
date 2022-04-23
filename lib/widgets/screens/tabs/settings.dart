@@ -26,7 +26,7 @@ class _SettingsState extends State<Settings> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     _profileItem() {
-      final imageFile = File(userData.currentUser.imageUrl);
+      final imageFile = File(userData.currentUser?.avatar);
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 20),
@@ -44,7 +44,7 @@ class _SettingsState extends State<Settings> {
                       flex: 1,
                       child: CircleAvatar(
                         child: ClipOval(
-                          child: userData.currentUser.imageUrl == '' ? Image.network(
+                          child: userData.currentUser?.avatar == '' ? Image.network(
                             'https://media.istockphoto.com/photos/businessman-silhouette-as-avatar-or-default-profile-picture-picture-id476085198?k=20&m=476085198&s=612x612&w=0&h=8J3VgOZab_OiYoIuZfiMIvucFYB8vWYlKnSjKuKeYQM=',
                             width: 60,
                             height: 60,
@@ -65,7 +65,7 @@ class _SettingsState extends State<Settings> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            userData.currentUser.fullName,
+                            userData.currentUser?.name,
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
@@ -74,7 +74,7 @@ class _SettingsState extends State<Settings> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             child: Text(
-                              userData.currentUser.email,
+                              userData.currentUser?.email,
                               style: const TextStyle(
                                   fontSize: 12, color: Color(0xFF616161)),
                             ),

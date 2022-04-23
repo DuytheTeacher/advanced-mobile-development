@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final tutorProvider = Provider.of<TutorProvider>(context);
     final classProvider = Provider.of<ClassProvider>(context);
 
-    List<Class> classes = classProvider.getClassByUserId(userProvider.currentUser.id);
+    List<Class> classes = classProvider.getClassByUserId(userProvider.currentUser?.id);
     classes.sort((a, b) => a.schedule.compareTo(b.schedule));
 
     _bookingSection() {

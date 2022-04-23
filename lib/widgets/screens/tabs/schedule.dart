@@ -246,7 +246,7 @@ class _ScheduleState extends State<Schedule> {
     final userProvider = Provider.of<UserProvider>(context);
 
     final upcomingClasses =
-        classProvider.getClassByUserId(userProvider.currentUser.id);
+        classProvider.getClassByUserId(userProvider.currentUser?.id);
 
     upcomingClasses.sort((a, b) => a.schedule.compareTo(b.schedule));
 
