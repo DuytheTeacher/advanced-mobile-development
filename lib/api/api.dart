@@ -14,7 +14,8 @@ class Api {
       if (!options.path.contains('http')) {
         options.path = 'https://sandbox.api.lettutor.com' + options.path;
       }
-      if (options.path.contains('/auth/login')) {
+      if (options.path.contains('/auth/login') ||
+          options.path.contains('/auth/register')) {
         return handler.next(options);
       }
       options.headers['Authorization'] = 'Bearer $accessToken';
@@ -25,8 +26,8 @@ class Api {
       // If you want to reject the request with a error message,
       // you can reject a `DioError` object eg: `handler.reject(dioError)`
     }, onError: (DioError error, handler) async {
-      if ((error.response?.statusCode == 500 &&
-              error.response?.data['message'] == "Please authenticate") &&
+      if (error.response?.statusCode == 500 &&
+          error.response?.data['message'] == "Please authenticate" &&
           error.response?.data['statusCode'] == 1) {
         prefs = await SharedPreferences.getInstance();
         var authObject = json.decode(prefs.getString('auth') ?? '{}');
