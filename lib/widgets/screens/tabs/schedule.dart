@@ -121,8 +121,8 @@ class _ScheduleState extends State<Schedule> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, TutorDetail.routeName,
-                              arguments: TutorDetailArguments(tutorDetail.id));
+                          // Navigator.pushNamed(context, TutorDetail.routeName,
+                          //     arguments: TutorDetailArguments(tutorDetail.id));
                         },
                         child: Text(
                           tutorDetail.name,
@@ -271,7 +271,7 @@ class _ScheduleState extends State<Schedule> {
                       fontWeight: FontWeight.w900, fontSize: 28),
                 ),
                 const Text('1 lesson'),
-                _tutorSection(tutorDetail),
+                // _tutorSection(tutorDetail),
                 _scheduleSection(currentClass),
                 SizedBox(
                   width: double.infinity,

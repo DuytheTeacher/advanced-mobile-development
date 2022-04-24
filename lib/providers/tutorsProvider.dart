@@ -318,7 +318,35 @@ class TutorProvider with ChangeNotifier {
     return [..._tutors].where((element) => element.isFavorite).toList();
   }
 
-  Tutor getTutorDetailById(String id) {
-    return _tutors.singleWhere((element) => element.id == id);
+  TutorModel getTutorDetailById(String id) {
+    return _tutorsModel.singleWhere((element) => element.id == id);
+  }
+
+  Future<dynamic> getTutorDetailAsync(tutorId) async {
+    try {
+      var resp = await api.get('/tutor/$tutorId');
+      return resp.data;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        _errorMessage = e.response?.data['message'];
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
+  }
+  
+  Future<dynamic> getScheduleByTutorId(tutorId) async {
+    try {
+      var resp = await api.post('/schedule', data: { 'tutorId': tutorId });
+      return resp.data['data'];
+    } on DioError catch (e) {
+      if (e.response != null) {
+        _errorMessage = e.response?.data['message'];
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
   }
 }

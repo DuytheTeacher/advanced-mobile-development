@@ -142,10 +142,13 @@ class _TutorCardState extends State<TutorCard> {
 
   @override
   Widget build(BuildContext context) {
+    final tutorProvider = Provider.of<TutorProvider>(context);
+
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        var asyncDetail = await tutorProvider.getTutorDetailAsync(widget.tutor.userId);
         Navigator.pushNamed(context, TutorDetail.routeName,
-            arguments: TutorDetailArguments(widget.tutor.id));
+            arguments: TutorDetailArguments(widget.tutor.id, asyncDetail));
       },
       behavior: HitTestBehavior.translucent,
       child: Card(

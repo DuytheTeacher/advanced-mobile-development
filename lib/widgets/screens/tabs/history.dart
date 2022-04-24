@@ -222,7 +222,7 @@ class _HistoryState extends State<History> {
                 ),
                 Text(
                     '${DateTime.now().difference(currentClass.schedule).inHours} hours ago'),
-                _tutorSection(tutorDetail),
+                // _tutorSection(tutorDetail),
                 _historySection(currentClass),
                 _reviewSection()
               ],

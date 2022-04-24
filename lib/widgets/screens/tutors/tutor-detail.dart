@@ -1,6 +1,11 @@
+import 'dart:convert';
+
+import 'package:advanced_mobile_dev/api/api.dart';
+import 'package:advanced_mobile_dev/models/tutor-model.dart';
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -32,31 +37,33 @@ class _TutorDetailState extends State<TutorDetail> {
       exp: '',
       isFavorite: false);
 
+  TutorModel? tutorModelDetail;
+  var _additionalDetail;
+  var _scheduleList;
+  var arg;
+
   DateTime pickedDate = DateTime.now();
 
   VideoPlayerController? _controller;
   Future<void>? _initializeVideoPlayerFuture;
 
   @override
-  initState() {
+  void didChangeDependencies() async {
+    final tutorProvider = Provider.of<TutorProvider>(context, listen: false);
+    arg = ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
+
+    _additionalDetail = arg.asyncDetail;
     _controller = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+      _additionalDetail['video'],
     );
+    tutorModelDetail = tutorProvider.getTutorDetailById(arg.id);
+    _scheduleList =
+        await tutorProvider.getScheduleByTutorId(_additionalDetail['userId']);
 
     _initializeVideoPlayerFuture = _controller?.initialize();
-
     _controller?.play();
 
-    Future.delayed(Duration.zero, () {
-      final args =
-          ModalRoute.of(context)!.settings.arguments as TutorDetailArguments;
-      final tutorProvider = Provider.of<TutorProvider>(context, listen: false);
-      setState(() {
-        tutorDetail = tutorProvider.getTutorDetailById(args.id);
-      });
-    });
-
-    super.initState();
+    super.didChangeDependencies();
   }
 
   @override
@@ -146,7 +153,7 @@ class _TutorDetailState extends State<TutorDetail> {
   _tutorDescription() {
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
-        child: Text(tutorDetail.description));
+        child: Text(tutorModelDetail?.bio));
   }
 
   _chipsSectionGenerator(String section, List<String> chips) {
@@ -170,7 +177,7 @@ class _TutorDetailState extends State<TutorDetail> {
                   (index) => Chip(
                       backgroundColor: Theme.of(context).primaryColorLight,
                       label: Text(
-                        chips[index],
+                        chips[index].toUpperCase(),
                         style: TextStyle(
                             fontSize: 10,
                             color: Theme.of(context).primaryColor),
@@ -207,7 +214,7 @@ class _TutorDetailState extends State<TutorDetail> {
     );
   }
 
-  _commentCard(Comment comment) {
+  _commentCard(dynamic comment) {
     return Card(
       elevation: 5,
       child: Padding(
@@ -219,7 +226,7 @@ class _TutorDetailState extends State<TutorDetail> {
                 child: CircleAvatar(
                   child: ClipOval(
                     child: Image.network(
-                      comment.userImageUrl,
+                      comment['firstInfo']['avatar'],
                       width: 35,
                       height: 35,
                       fit: BoxFit.cover,
@@ -239,16 +246,16 @@ class _TutorDetailState extends State<TutorDetail> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            comment.userName,
+                            comment['firstInfo']['name'],
                             style: const TextStyle(fontSize: 15),
                           ),
-                          _generateStars(comment.ratingStars),
+                          _generateStars(comment['rating']),
                         ],
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          comment.content,
+                          comment['content'],
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
                           style: const TextStyle(
@@ -261,8 +268,8 @@ class _TutorDetailState extends State<TutorDetail> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              DateFormat('dd/MM/yyyy, hh:mm')
-                                  .format(comment.date),
+                              DateFormat('E, d MMM y, hh:mm')
+                                  .format(DateTime.parse(comment['createdAt'])),
                               style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
@@ -280,7 +287,7 @@ class _TutorDetailState extends State<TutorDetail> {
     );
   }
 
-  _listCommentsGenerator(List<Comment> comments) {
+  _listCommentsGenerator(List<dynamic> comments) {
     return Column(
       children: [...comments.map((element) => _commentCard(element)).toList()],
     );
@@ -288,7 +295,6 @@ class _TutorDetailState extends State<TutorDetail> {
 
   _commentSectionGenerator() {
     final tutorData = Provider.of<TutorProvider>(context);
-    List<Comment> comments = tutorData.generateComments();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,40 +302,71 @@ class _TutorDetailState extends State<TutorDetail> {
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Text(
-            'Rating and comments (${comments.length})',
+            'Rating and comments (${_additionalDetail['User']['feedbacks'].length})',
             style:
                 TextStyle(color: Theme.of(context).primaryColor, fontSize: 16),
           ),
         ),
-        _listCommentsGenerator(comments)
+        _listCommentsGenerator(_additionalDetail['User']['feedbacks'])
       ],
     );
   }
 
   _listDateBooking(BuildContext ctx) {
+    var list = _scheduleList
+        .where((element) => DateTime.fromMicrosecondsSinceEpoch(
+                element['startTimestamp'] * 1000)
+            .isAfter(DateTime.now()))
+        .toList();
+
+    list.sort((a, b) {
+      return DateTime.fromMicrosecondsSinceEpoch(a['startTimestamp'] * 1000)
+              .isAfter(DateTime.fromMicrosecondsSinceEpoch(
+                  b['startTimestamp'] * 1000))
+          ? 1
+          : -1;
+    });
+
     return SizedBox(
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          children: List.generate(7, (index) {
+          children: list.isNotEmpty ? list.sublist(0, 7).map<Widget>((element) {
             return SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50))),
-                  onPressed: () {
+                  onPressed: () async {
+                    var api = Api().api;
+                    try {
+                      await api.post('/booking', data: json.encode({ 'scheduleDetailIds': [ element['scheduleDetails'][0]['id'] ] }));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: const Text('Book classroom successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).accentColor,),
+                      );
+                    } on DioError catch (e) {
+                      if (e.response != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.response?.data['message']), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
+                        );
+                      } else {
+                        // Something happened in setting up or sending the request that triggered an Error
+                        print(e.message);
+                      }
+                    }
+
                     setState(() {
-                      pickedDate =
-                          DateTime.now().add(Duration(days: index, hours: 0));
+                      pickedDate = DateTime.fromMicrosecondsSinceEpoch(
+                          element['startTimestamp'] * 1000);
                     });
-                    _showTimeBookingModal(ctx);
                   },
-                  child: Text(DateFormat('dd-MM-yyyy')
-                      .format(DateTime.now().add(Duration(days: index))))),
+                  child: Text(DateFormat('E, dd MMMM y, hh:mm a').format(
+                      DateTime.fromMicrosecondsSinceEpoch(
+                          element['startTimestamp'] * 1000)))),
             );
-          }),
+          }).toList() : [],
         ),
       ),
     );
@@ -483,7 +520,7 @@ class _TutorDetailState extends State<TutorDetail> {
               child: CircleAvatar(
                 child: ClipOval(
                   child: Image.network(
-                    tutorDetail.imageUrl,
+                    _additionalDetail['User']['avatar'] ?? '',
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
@@ -498,7 +535,7 @@ class _TutorDetailState extends State<TutorDetail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    tutorDetail.name,
+                    _additionalDetail['User']['name'] ?? '',
                     style: const TextStyle(fontSize: 17),
                   ),
                   const Padding(
@@ -508,7 +545,7 @@ class _TutorDetailState extends State<TutorDetail> {
                       style: TextStyle(fontSize: 12, color: Color(0xFF616161)),
                     ),
                   ),
-                  Text(tutorDetail.country)
+                  Text(_additionalDetail['User']['country'] ?? '')
                 ],
               )),
           Expanded(
@@ -517,13 +554,35 @@ class _TutorDetailState extends State<TutorDetail> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  _generateStars(tutorDetail.ratingStars),
+                  _generateStars(_additionalDetail['avgRating'].round() ?? 0),
                   IconButton(
-                    onPressed: () {
-                      tutorData.toggleFavorite(tutorDetail.id);
+                    onPressed: () async {
+                      var resp = await tutorData
+                          .toggleFavorite(tutorModelDetail?.userId);
+                      if (resp != null && resp == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text('Tutor is added to Favorite'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Theme.of(context).accentColor,
+                        ));
+                      } else if (resp != null && resp == false) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Text('Tutor is removed from Favorite'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Theme.of(context).accentColor,
+                        ));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(tutorData.errorMessage),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Theme.of(context).accentColor,
+                        ));
+                      }
                     },
                     icon: Icon(
-                      tutorDetail.isFavorite
+                      tutorData.tutorModelFavorites.indexWhere((element) =>
+                                  element == tutorModelDetail?.userId) !=
+                              -1
                           ? Icons.favorite
                           : Icons.favorite_outline,
                       color: Colors.red,
@@ -565,10 +624,12 @@ class _TutorDetailState extends State<TutorDetail> {
               ),
               _actionsGroup(),
               _tutorDescription(),
-              _chipsSectionGenerator('Languages', tutorDetail.languages),
-              _chipsSectionGenerator('Specialities', tutorDetail.specialities),
-              _textSectionGenerator('Interest', tutorDetail.interest),
-              _textSectionGenerator('Teaching Experience', tutorDetail.exp),
+              _chipsSectionGenerator('Languages', tutorModelDetail?.languages),
+              _chipsSectionGenerator(
+                  'Specialities', tutorModelDetail?.specialties),
+              _textSectionGenerator('Interest', tutorModelDetail?.interests),
+              _textSectionGenerator(
+                  'Teaching Experience', tutorModelDetail?.experience),
               _commentSectionGenerator()
             ]),
           ),
@@ -581,6 +642,7 @@ class _TutorDetailState extends State<TutorDetail> {
 
 class TutorDetailArguments {
   final String id;
+  final dynamic asyncDetail;
 
-  TutorDetailArguments(this.id);
+  TutorDetailArguments(this.id, this.asyncDetail);
 }
