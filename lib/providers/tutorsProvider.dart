@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'dart:convert';
 
+import 'package:advanced_mobile_dev/api/api.dart';
+import 'package:advanced_mobile_dev/models/tutor-model.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tab-bar.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tabs/tutor-list.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -102,9 +105,30 @@ class Comment {
 class TutorProvider with ChangeNotifier {
   List<Tutor> _tutors = [];
   late SharedPreferences prefs;
+  List<TutorModel> _tutorsModel = [];
+  List<String> _favoriteTutors = [];
+  Set<String> _specialties = Set();
+  var api = Api().api;
+  var _errorMessage;
 
   List<Tutor> get tutorsList {
     return [..._tutors];
+  }
+
+  List<TutorModel> get tutorsModelList {
+    return _tutorsModel;
+  }
+
+  List<String> get tutorModelFavorites {
+    return _favoriteTutors;
+  }
+
+  List<String> get specialties {
+    return _specialties.toList();
+  }
+
+  String get errorMessage {
+    return _errorMessage;
   }
 
   TutorProvider() {
@@ -122,13 +146,35 @@ class TutorProvider with ChangeNotifier {
 
   saveData() async {
     List<String> spList =
-    _tutors.map((item) => json.encode(item.toMap())).toList();
+        _tutors.map((item) => json.encode(item.toMap())).toList();
     await prefs.setStringList('tutors', spList);
   }
 
-  loadData() async {
-    List<String> spList = await prefs.getStringList('tutors') ?? [];
-    _tutors = spList.map((item) => Tutor.fromMap(json.decode(item))).toList();
+  Future<void> loadData() async {
+    try {
+      var resp = await api
+          .get('/tutor/more', queryParameters: {"perPage": 9, "page": 1});
+      _tutorsModel = resp.data['tutors']['rows']
+          .map<TutorModel>((item) => TutorModel.fromJson(item))
+          .toList();
+      if (resp.data['favoriteTutor'].isNotEmpty) {
+        resp.data['favoriteTutor'].forEach((item) {
+          _favoriteTutors.add(item['secondId']);
+        });
+      }
+      for (var e in _tutorsModel) {
+        e.languages = e.languages.split(',').toList() as List<String>;
+        e.specialties = e.specialties.split(',').toList() as List<String>;
+        _specialties.addAll(e.specialties);
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        _errorMessage = e.response?.data['message'];
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
     notifyListeners();
   }
 
@@ -210,23 +256,39 @@ class TutorProvider with ChangeNotifier {
                 DateTime.now().subtract(Duration(days: Random().nextInt(30)))));
   }
 
-  void toggleFavorite(String tutorId) {
-    int index = _tutors.indexWhere((element) => element.id == tutorId);
-    _tutors[index].isFavorite = !_tutors[index].isFavorite;
-    notifyListeners();
-    saveData();
+  Future<bool?> toggleFavorite(String tutorId) async {
+    try {
+      var resp = await api
+          .post('/user/manageFavoriteTutor', data: {'tutorId': tutorId});
+      if (resp.data['result'] != 1) {
+        _favoriteTutors.add(resp.data['result']['secondId']);
+      } else {
+        _favoriteTutors.remove(tutorId);
+      }
+      notifyListeners();
+      return resp.data['result'] != 1;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        _errorMessage = e.response?.data['message'];
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+      notifyListeners();
+      return null;
+    }
   }
 
-  List<Tutor> queryTutor(SearchOptions filter, String queryString) {
+  List<TutorModel> queryTutor(SearchOptions filter, String queryString) {
     if (queryString == 'all') {
-      return [..._tutors];
+      return [..._tutorsModel];
     } else if (filter == SearchOptions.name) {
-      return _tutors
+      return _tutorsModel
           .where((element) =>
               element.name.toLowerCase().startsWith(queryString.toLowerCase()))
           .toList();
     } else {
-      return _tutors
+      return _tutorsModel
           .where((element) => element.country
               .toLowerCase()
               .startsWith(queryString.toLowerCase()))
@@ -234,21 +296,21 @@ class TutorProvider with ChangeNotifier {
     }
   }
 
-  List<Tutor> queryTutorWithSpecAndSort(
+  List<TutorModel> queryTutorWithSpecAndSort(
       List<String> specs, SortingOptions sorting) {
-    List<Tutor> tempList = [..._tutors];
+    List<TutorModel> tempList = [..._tutorsModel];
 
     if (sorting == SortingOptions.ascending) {
-      tempList.sort((a, b) => a.ratingStars.compareTo(b.ratingStars));
+      tempList.sort((a, b) => b.name.compareTo(a.name));
     } else if (sorting == SortingOptions.descending) {
-      tempList.sort((a, b) => a.ratingStars.compareTo(b.ratingStars) * -1);
+      tempList.sort((a, b) => a.name.compareTo(b.name));
     }
 
     if (specs.isEmpty) {
       return tempList;
     }
     return [...tempList].where((element) {
-      return [...element.specialities].where(specs.contains).isNotEmpty;
+      return [...element.specialties].where(specs.contains).isNotEmpty;
     }).toList();
   }
 

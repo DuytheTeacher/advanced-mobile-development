@@ -1,12 +1,15 @@
+import 'package:advanced_mobile_dev/models/tutor-model.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class TutorCard extends StatefulWidget {
-  TutorCard({Key? key, required this.tutor}) : super(key: key);
+  TutorCard({Key? key, required this.tutor, required this.favorites})
+      : super(key: key);
 
-  Tutor tutor;
+  TutorModel tutor;
+  List<String> favorites;
 
   @override
   _TutorCardState createState() => _TutorCardState();
@@ -36,12 +39,12 @@ class _TutorCardState extends State<TutorCard> {
         width: double.infinity,
         child: ListView(
           scrollDirection: Axis.horizontal,
-          children: widget.tutor.specialities.map((element) {
+          children: widget.tutor.specialties.map<Widget>((element) {
             return Padding(
               padding: const EdgeInsets.only(right: 5),
               child: Chip(
                 backgroundColor: Theme.of(context).primaryColorLight,
-                label: Text(element,
+                label: Text(element.toUpperCase(),
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 8)),
               ),
@@ -60,7 +63,7 @@ class _TutorCardState extends State<TutorCard> {
               child: CircleAvatar(
                 child: ClipOval(
                   child: Image.network(
-                    widget.tutor.imageUrl,
+                    widget.tutor.avatar,
                     width: 45,
                     height: 45,
                     fit: BoxFit.cover,
@@ -81,7 +84,7 @@ class _TutorCardState extends State<TutorCard> {
                       widget.tutor.name,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    _generateStars(widget.tutor.ratingStars),
+                    _generateStars(5),
                     _generateBadges()
                   ],
                 )),
@@ -89,11 +92,36 @@ class _TutorCardState extends State<TutorCard> {
           Expanded(
               flex: 1,
               child: IconButton(
-                icon: widget.tutor.isFavorite == true ? const Icon(Icons.favorite) : const Icon(Icons.favorite_border),
+                icon: widget.favorites.indexWhere(
+                            (element) => element == widget.tutor.userId) !=
+                        -1
+                    ? const Icon(Icons.favorite)
+                    : const Icon(Icons.favorite_border),
                 color: Colors.red,
-                onPressed: () {
-                  final tutorData = Provider.of<TutorProvider>(context, listen: false);
-                  tutorData.toggleFavorite(widget.tutor.id);
+                onPressed: () async {
+                  final tutorData =
+                      Provider.of<TutorProvider>(context, listen: false);
+                  var resp =
+                      await tutorData.toggleFavorite(widget.tutor.userId);
+                  if (resp != null && resp == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('Tutor is added to Favorite'),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(context).accentColor,
+                    ));
+                  } else if (resp != null && resp == false) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('Tutor is removed from Favorite'),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(context).accentColor,
+                    ));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(tutorData.errorMessage),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(context).accentColor,
+                    ));
+                  }
                 },
               )),
         ],
@@ -103,7 +131,7 @@ class _TutorCardState extends State<TutorCard> {
 
   _tutorDescription() {
     return Text(
-      widget.tutor.description,
+      widget.tutor.bio,
       overflow: TextOverflow.ellipsis,
       maxLines: 4,
       style: const TextStyle(
@@ -116,7 +144,8 @@ class _TutorCardState extends State<TutorCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, TutorDetail.routeName, arguments: TutorDetailArguments(widget.tutor.id));
+        Navigator.pushNamed(context, TutorDetail.routeName,
+            arguments: TutorDetailArguments(widget.tutor.id));
       },
       behavior: HitTestBehavior.translucent,
       child: Card(

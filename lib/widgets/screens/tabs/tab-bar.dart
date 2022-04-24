@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../../models/tutor-model.dart';
+
 enum SearchOptions { name, country }
 
 class Tabbar extends StatefulWidget {
@@ -32,12 +34,24 @@ class _TabbarState extends State<Tabbar> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, Object>> _pages = [
-      {'page': HomeScreen(seclectPage: _seclectPage), 'title': AppLocalizations.of(context)!.home},
-      {'page': const Schedule(), 'title': AppLocalizations.of(context)!.schedule},
-      {'page': const TurtorList(), 'title': AppLocalizations.of(context)!.tutors},
+      {
+        'page': HomeScreen(seclectPage: _seclectPage),
+        'title': AppLocalizations.of(context)!.home
+      },
+      {
+        'page': const Schedule(),
+        'title': AppLocalizations.of(context)!.schedule
+      },
+      {
+        'page': const TurtorList(),
+        'title': AppLocalizations.of(context)!.tutors
+      },
       {'page': const Courses(), 'title': AppLocalizations.of(context)!.courses},
       {'page': const History(), 'title': AppLocalizations.of(context)!.history},
-      {'page': Settings(seclectPage: _seclectPage), 'title': AppLocalizations.of(context)!.settings},
+      {
+        'page': Settings(seclectPage: _seclectPage),
+        'title': AppLocalizations.of(context)!.settings
+      },
     ];
 
     _popupMenu() {
@@ -225,23 +239,21 @@ class TutorSearch extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     final tutorProvider = Provider.of<TutorProvider>(context);
-    List<Tutor> list = tutorProvider.queryTutor(filter, query);
+    List<TutorModel> list = tutorProvider.queryTutor(filter, query);
+    List<String> favorites = tutorProvider.tutorModelFavorites;
 
     return SingleChildScrollView(
-        child: TutorList(
-      tutorsList: list,
-    ));
+        child: TutorList(tutorsList: list, favorites: favorites));
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     final tutorProvider = Provider.of<TutorProvider>(context);
-    List<Tutor> list = tutorProvider.queryTutor(filter, query);
+    List<TutorModel> list = tutorProvider.queryTutor(filter, query);
+    List<String> favorites = tutorProvider.tutorModelFavorites;
 
     return SingleChildScrollView(
-      child: TutorList(
-        tutorsList: list,
-      ),
+      child: TutorList(tutorsList: list, favorites: favorites),
     );
   }
 }

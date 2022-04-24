@@ -30,13 +30,14 @@ class UserProvider with ChangeNotifier {
   void loadData() async {
     List<String> spList = await prefs.getStringList('users') ?? [];
     String? currentUserFromPrefs = await prefs.getString('currentUser');
-    _authenticated = await prefs.getString('authenticated') == 'true' ? true : false;
+    _authenticated =
+        await prefs.getString('authenticated') == 'true' ? true : false;
     notifyListeners();
   }
 
   String get errorMessage {
     return _errorMessage;
-}
+  }
 
   bool get authenticated {
     return _authenticated;
@@ -46,13 +47,16 @@ class UserProvider with ChangeNotifier {
     return _currentUser;
   }
 
-  Future<void> login (email, password) async {
+  Future<void> login(email, password) async {
     try {
-      var resp = await api.post(
-          '/auth/login', data: {"email": email, "password": password});
+      var resp = await api
+          .post('/auth/login', data: {"email": email, "password": password});
       _currentUser = UserModel.fromJson(resp.data['user']);
-      Map<String, dynamic> token = {'accessToken': resp.data['tokens']['access']['token'], 'refreshToken': resp.data['tokens']['refresh']['token']};
-      prefs.setString('auth', token.toString());
+      Map<String, dynamic> token = {
+        'accessToken': resp.data['tokens']['access']['token'],
+        'refreshToken': resp.data['tokens']['refresh']['token']
+      };
+      prefs.setString('auth', json.encode(token));
       prefs.setString('currentUser', resp.data['user'].toString());
       _authenticated = true;
     } on DioError catch (e) {
@@ -75,10 +79,11 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> register (String email, String password) async {
+  Future<bool> register(String email, String password) async {
     try {
-      await api.post(
-          '/auth/register', data: {"email": email, "password": password}, options: Options(contentType: Headers.formUrlEncodedContentType));
+      await api.post('/auth/register',
+          data: {"email": email, "password": password},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
       return true;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -92,7 +97,8 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  void updateProfile(DateTime birthday, String phone, String country, String level, String imageUrl) {
+  void updateProfile(DateTime birthday, String phone, String country,
+      String level, String imageUrl) {
     // _currentUser.birthday = birthday;
     // _currentUser.phone = phone;
     // _currentUser.country = country;
@@ -102,12 +108,18 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  String recoveryPassword(String email) {
-    // bool checkExited = _usersList.any((element) => element.email == email);
-    // if (checkExited) {
-    //   User returnedUser = _usersList.firstWhere((element) => element.email == email);
-    //   return returnedUser.password;
-    // }
-    return '';
+  Future<String?> recoveryPassword(String email) async {
+    try {
+      var resp = await api.post('/user/forgotPassword', data: {"email": email});
+      return resp.data['message'];
+    } on DioError catch (e) {
+      if (e.response != null) {
+        _errorMessage = e.response?.data['message'];
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
+    return null;
   }
 }

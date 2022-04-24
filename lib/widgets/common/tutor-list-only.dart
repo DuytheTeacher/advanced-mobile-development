@@ -1,12 +1,17 @@
+import 'package:advanced_mobile_dev/api/api.dart';
+import 'package:advanced_mobile_dev/models/tutor-model.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/widgets/common/tutor-card.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class TutorList extends StatefulWidget {
-  TutorList({Key? key, required this.tutorsList}) : super(key: key);
+  TutorList({Key? key, required this.tutorsList, required this.favorites})
+      : super(key: key);
 
-  List<Tutor> tutorsList;
+  List<TutorModel> tutorsList;
+  List<String> favorites;
 
   @override
   State<TutorList> createState() => _TutorListState();
@@ -21,7 +26,9 @@ class _TutorListState extends State<TutorList> {
   bool _isLoadMoreRunning = false;
   late ScrollController _controller;
 
-  List<Tutor> tutors = [];
+  List<TutorModel> tutors = [];
+
+  var api = Api().api;
 
   @override
   initState() {
@@ -103,13 +110,16 @@ class _TutorListState extends State<TutorList> {
           : Column(
               children: [
                 tutors.isEmpty
-                    ? const Center(
-                        child: Text(
-                        'There is no tutor!',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ))
+                    ? const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Center(
+                            child: Text(
+                          'There is no tutor!',
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                        )),
+                      )
                     : SizedBox(
                         height: _isLoadMoreRunning ? 427 : 483,
                         child: ListView.separated(
@@ -118,11 +128,10 @@ class _TutorListState extends State<TutorList> {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           itemCount: tutors.length,
                           itemBuilder: (BuildContext context, int index) {
-                            Tutor tutor = tutors[index];
+                            TutorModel tutor = tutors[index];
                             return Center(
                                 child: TutorCard(
-                              tutor: tutor,
-                            ));
+                                    tutor: tutor, favorites: widget.favorites));
                           },
                           separatorBuilder: (BuildContext context, int index) =>
                               const Divider(),

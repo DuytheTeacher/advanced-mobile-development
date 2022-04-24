@@ -30,7 +30,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     final userData = Provider.of<UserProvider>(context, listen: false);
     setState(() {
-      _selectedDate = DateFormat("yyyy-MM-dd").parse(userData.currentUser?.birthday);
+      _selectedDate = userData.currentUser?.birthday != null ? DateFormat("yyyy-MM-dd").parse(userData.currentUser?.birthday) : DateTime.now();
       _phoneController.text = userData.currentUser?.phone;
       _countryController = userData.currentUser?.country;
       // _levelController = userData.currentUser?.level;

@@ -87,18 +87,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 fixedSize: const Size(300, 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
-            onPressed: () {
-              final returnedPassword = userData.recoveryPassword(emailController.text);
-              String message = 'Can not find your email address. Please check again!';
-
-              if (returnedPassword.isNotEmpty) {
-                message = 'Your password is $returnedPassword . Please do not share with other people';
+            onPressed: () async {
+              final returnedPassword = await userData.recoveryPassword(emailController.text);
+              if (returnedPassword != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(returnedPassword),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Theme.of(context).accentColor,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(userData.errorMessage),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Theme.of(context).errorColor,
+                  ),
+                );
               }
-              NotificationApi.showNotification(
-                title: 'Recovery password',
-                body: message,
-                payload: 'sarah.abs'
-              );
             },
             child: const Text(
               'Send',

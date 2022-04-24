@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/models/tutor-model.dart';
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
@@ -51,7 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final tutorProvider = Provider.of<TutorProvider>(context);
     final classProvider = Provider.of<ClassProvider>(context);
 
-    List<Class> classes = classProvider.getClassByUserId(userProvider.currentUser?.id);
+    List<Class> classes =
+        classProvider.getClassByUserId(userProvider.currentUser?.id);
     classes.sort((a, b) => a.schedule.compareTo(b.schedule));
 
     _bookingSection() {
@@ -71,7 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  AppLocalizations.of(context)!.totalLessonTime(totalTime.inHours.toString(), (totalTime.inMinutes % 60).toString()),
+                  AppLocalizations.of(context)!.totalLessonTime(
+                      totalTime.inHours.toString(),
+                      (totalTime.inMinutes % 60).toString()),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -94,51 +98,64 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: classes.isNotEmpty ? Row(
-                    children: [
-                      Expanded(
-                          flex: 5,
+                  child: classes.isNotEmpty
+                      ? Row(
+                          children: [
+                            Expanded(
+                                flex: 5,
+                                child: Text(
+                                  nextClassText,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor),
+                                )),
+                            Expanded(
+                              flex: 4,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, VideoCall.routeName,
+                                      arguments: VideoCallArguments(
+                                          classes[0].schedule));
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Icon(
+                                      Icons.video_call_rounded,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .enterLessonRoom,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                    ),
+                                  ],
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                    primary: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    fixedSize:
+                                        const Size(120, double.minPositive),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(50))),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Center(
                           child: Text(
-                            nextClassText,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 18,
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor),
-                          )),
-                      Expanded(
-                        flex: 4,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, VideoCall.routeName,
-                                arguments:
-                                VideoCallArguments(classes[0].schedule));
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(
-                                Icons.video_call_rounded,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              Text(
-                                AppLocalizations.of(context)!.enterLessonRoom,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: Theme.of(context).primaryColor),
-                              ),
-                            ],
-                          ),
-                          style: ElevatedButton.styleFrom(
-                              primary:
-                                  Theme.of(context).scaffoldBackgroundColor,
-                              fixedSize: const Size(120, double.minPositive),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50))),
-                        ),
-                      ),
-                    ],
-                  ) : Center(child: Text(AppLocalizations.of(context)!.thereIsNoUpcomingClass, style: TextStyle(color: Theme.of(context).scaffoldBackgroundColor),)),
+                          AppLocalizations.of(context)!.thereIsNoUpcomingClass,
+                          style: TextStyle(
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                        )),
                 ),
               ],
             ),
@@ -146,17 +163,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     _listRecommendedTutors() {
+      List<String> favorites = tutorProvider.tutorModelFavorites;
       return SizedBox(
         height: classes.isNotEmpty ? 327 : 357,
         child: ListView.separated(
           padding: const EdgeInsets.all(8),
-          itemCount: tutorProvider.tutorsList.length,
+          itemCount: tutorProvider.tutorsModelList.length,
           itemBuilder: (BuildContext context, int index) {
-            Tutor tutor = tutorProvider.tutorsList[index];
-            return Center(
-                child: TutorCard(
-              tutor: tutor,
-            ));
+            TutorModel tutor = tutorProvider.tutorsModelList[index];
+            return Center(child: TutorCard(tutor: tutor, favorites: favorites));
           },
           separatorBuilder: (BuildContext context, int index) =>
               const Divider(),

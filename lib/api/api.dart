@@ -18,6 +18,8 @@ class Api {
           options.path.contains('/auth/register')) {
         return handler.next(options);
       }
+      prefs = await SharedPreferences.getInstance();
+      accessToken = json.decode(prefs.getString('auth') ?? '{}')['accessToken'];
       options.headers['Authorization'] = 'Bearer $accessToken';
       return handler.next(options);
     }, onResponse: (response, handler) {
