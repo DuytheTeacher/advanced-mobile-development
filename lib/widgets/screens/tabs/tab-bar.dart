@@ -194,7 +194,7 @@ class CourseSearch extends SearchDelegate<String> {
 
     return SingleChildScrollView(
         child: CoursesList(
-      coursesList: list,
+          query: query
     ));
   }
 
@@ -205,7 +205,7 @@ class CourseSearch extends SearchDelegate<String> {
 
     return SingleChildScrollView(
         child: CoursesList(
-      coursesList: list,
+          query: query
     ));
   }
 }
