@@ -313,7 +313,7 @@ class _TutorDetailState extends State<TutorDetail> {
   }
 
   _listDateBooking(BuildContext ctx) {
-    var list = _scheduleList
+    var list = _scheduleList == null ? [] : _scheduleList
         .where((element) => DateTime.fromMicrosecondsSinceEpoch(
                 element['startTimestamp'] * 1000)
             .isAfter(DateTime.now()))
@@ -356,6 +356,7 @@ class _TutorDetailState extends State<TutorDetail> {
                         print(e.message);
                       }
                     }
+                    Navigator.pop(context);
 
                     setState(() {
                       pickedDate = DateTime.fromMicrosecondsSinceEpoch(
@@ -366,7 +367,7 @@ class _TutorDetailState extends State<TutorDetail> {
                       DateTime.fromMicrosecondsSinceEpoch(
                           element['startTimestamp'] * 1000)))),
             );
-          }).toList() : [],
+          }).toList() : [Center()],
         ),
       ),
     );
