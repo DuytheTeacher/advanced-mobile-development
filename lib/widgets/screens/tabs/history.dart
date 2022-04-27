@@ -1,9 +1,12 @@
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
+import '../../../api/api.dart';
 
 class History extends StatefulWidget {
   const History({Key? key}) : super(key: key);
@@ -15,10 +18,13 @@ class History extends StatefulWidget {
 class _HistoryState extends State<History> {
   bool _isFirstLoading = false;
   bool _isMoreLoading = false;
-  int _page = 0;
+  int _page = 1;
   final int _limit = 5;
   bool _hasNextPage = true;
   late ScrollController _controller;
+
+  var api;
+  var classesList;
 
   List<Class> classes = [];
 
@@ -35,20 +41,47 @@ class _HistoryState extends State<History> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() async {
+    api = Api().api;
+    super.didChangeDependencies();
+  }
+
   void _firstLoad() async {
     setState(() {
       _isFirstLoading = true;
-      _page = 0;
+      _page = 1;
       _hasNextPage = true;
     });
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    final allClasses = Provider.of<ClassProvider>(context, listen: false)
-        .getHistoryByUserId(userProvider.currentUser?.id);
-    classes = allClasses.sublist(
-        0, allClasses.length > _limit ? _limit : allClasses.length);
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      api = Api().api;
+      var resp = await api.get('/booking/list/student', queryParameters: {
+        'page': _page,
+        'perPage': _limit,
+        'dateTimeLte': (DateTime.now().subtract(const Duration(minutes: 35)))
+                .microsecondsSinceEpoch /
+            1000,
+        'orderBy': 'meeting',
+        'sortBy': 'desc'
+      });
+      setState(() {
+        classesList = resp.data['data']['rows'];
+      });
+    } on DioError catch (e) {
+      if (e.response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.response?.data['message']),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Theme.of(context).errorColor,
+          ),
+        );
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
 
     setState(() {
       _isFirstLoading = false;
@@ -62,26 +95,37 @@ class _HistoryState extends State<History> {
         _controller.position.extentAfter < 100) {
       setState(() {
         _isMoreLoading = true;
+        _page += 1;
       });
 
-      final classProvider = Provider.of<ClassProvider>(context, listen: false);
-
-      await Future.delayed(const Duration(milliseconds: 1000));
-      _page += 1;
-      int total = classes.length;
-      int ending = _limit * (_page + 1);
-
-      setState(() {
-        if (total < _limit) {
-          _hasNextPage = false;
-          return;
-        } else if (ending <= total) {
-          classes.addAll(classProvider.classes.sublist(_limit * _page, ending));
+      try {
+        api = Api().api;
+        var resp = await api.get('/booking/list/student', queryParameters: {
+          'page': _page,
+          'perPage': _limit,
+          'dateTimeLte': (DateTime.now().subtract(const Duration(minutes: 35)))
+                  .microsecondsSinceEpoch /
+              1000,
+          'orderBy': 'meeting',
+          'sortBy': 'desc'
+        });
+        setState(() {
+          classesList.addAll(resp.data['data']['rows']);
+        });
+      } on DioError catch (e) {
+        if (e.response != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.response?.data['message']),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Theme.of(context).errorColor,
+            ),
+          );
         } else {
-          classes.addAll(classProvider.classes.sublist(_limit * _page));
-          _hasNextPage = false;
+          // Something happened in setting up or sending the request that triggered an Error
+          print(e.message);
         }
-      });
+      }
 
       setState(() {
         _isMoreLoading = false;
@@ -89,7 +133,7 @@ class _HistoryState extends State<History> {
     }
   }
 
-  _historySection(Class currentClass) {
+  _historySection(var currentClass) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Container(
@@ -104,8 +148,9 @@ class _HistoryState extends State<History> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Lesson Time: ${DateFormat.jm().format(currentClass.schedule)} - ${DateFormat.jm().format(currentClass.schedule.add(const Duration(hours: 1, minutes: 30)))}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'Lesson Time: ${DateFormat.jm().format(DateTime.fromMillisecondsSinceEpoch(currentClass['startTimestamp']))} - ${DateFormat.jm().format(DateTime.fromMillisecondsSinceEpoch(currentClass['endTimestamp']))}',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -138,7 +183,7 @@ class _HistoryState extends State<History> {
     );
   }
 
-  _tutorSection(Tutor tutorDetail) {
+  _tutorSection(var tutorDetail) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
@@ -154,7 +199,7 @@ class _HistoryState extends State<History> {
                   child: CircleAvatar(
                     child: ClipOval(
                       child: Image.network(
-                        tutorDetail.imageUrl,
+                        tutorDetail['avatar'],
                         width: 60,
                         height: 60,
                         fit: BoxFit.cover,
@@ -169,14 +214,14 @@ class _HistoryState extends State<History> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        tutorDetail.name,
+                        tutorDetail['name'],
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          tutorDetail.country,
+                          tutorDetail['country'],
                           style: const TextStyle(
                               fontSize: 12, color: Color(0xFF616161)),
                         ),
@@ -201,9 +246,7 @@ class _HistoryState extends State<History> {
 
     histories.sort((a, b) => a.schedule.compareTo(b.schedule));
 
-    _historyCard(Class currentClass) {
-      final tutorDetail = tutorProvider.getTutorDetailById(currentClass.tutorId);
-
+    _historyCard(var currentClass) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Container(
@@ -216,15 +259,18 @@ class _HistoryState extends State<History> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  DateFormat('E, d MMMM y').format(currentClass.schedule),
+                  DateFormat('E, d MMMM y').format(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          currentClass['scheduleDetailInfo']['scheduleInfo']
+                                  ['startTimestamp'])),
                   style: const TextStyle(
                       fontWeight: FontWeight.w900, fontSize: 28),
                 ),
                 Text(
-                    '${DateTime.now().difference(currentClass.schedule).inHours} hours ago'),
-                // _tutorSection(tutorDetail),
-                _historySection(currentClass),
-                _reviewSection()
+                    '${DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['startTimestamp'])).inHours} hours ago'),
+                _tutorSection(currentClass['scheduleDetailInfo']['scheduleInfo']['tutorInfo']),
+                _historySection(currentClass['scheduleDetailInfo']['scheduleInfo']),
+                // _reviewSection()
               ],
             ),
           ),
@@ -241,9 +287,9 @@ class _HistoryState extends State<History> {
               shrinkWrap: true,
               controller: _controller,
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: histories.length,
+              itemCount: classesList.length,
               itemBuilder: (BuildContext context, int index) {
-                Class currentClass = histories[index];
+                var currentClass = classesList[index];
                 return Center(child: _historyCard(currentClass));
               },
               separatorBuilder: (BuildContext context, int index) =>
@@ -296,7 +342,17 @@ class _HistoryState extends State<History> {
                 ),
               ),
             ),
-            histories.isEmpty ? const Center(child: Text('There is no history!', style: TextStyle(fontSize: 20),),) : _listHistory(),
+            _isFirstLoading
+                ? const Center(child: CircularProgressIndicator())
+                : classesList.isEmpty
+                    ? const Center(
+                        child: Text(
+                        'There is no history!',
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ))
+                    : _listHistory()
           ],
         ),
       ),
