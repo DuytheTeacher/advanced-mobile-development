@@ -4,6 +4,7 @@ import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Schedule extends StatefulWidget {
   const Schedule({Key? key}) : super(key: key);
@@ -204,7 +205,7 @@ class _ScheduleState extends State<Schedule> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
-                    'Lesson Time: ${DateFormat.jm().format(DateTime.fromMicrosecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['startTimestamp'] * 1000))} - ${DateFormat.jm().format(DateTime.fromMicrosecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['endTimestamp'] * 1000))}',
+                    '${AppLocalizations.of(context)!.lessonTime}: ${DateFormat.jm().format(DateTime.fromMicrosecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['startTimestamp'] * 1000))} - ${DateFormat.jm().format(DateTime.fromMicrosecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['endTimestamp'] * 1000))}',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -252,15 +253,15 @@ class _ScheduleState extends State<Schedule> {
                         });
                       },
                       child: Row(
-                        children: const <Widget>[
-                          Icon(
+                        children: <Widget>[
+                          const Icon(
                             Icons.cancel_outlined,
                             color: Colors.red,
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 5),
                             child: Text(
-                              'Cancel',
+                              AppLocalizations.of(context)!.cancelMeeting,
                               style: TextStyle(color: Colors.red),
                             ),
                           )
@@ -298,7 +299,7 @@ class _ScheduleState extends State<Schedule> {
                   style: const TextStyle(
                       fontWeight: FontWeight.w900, fontSize: 28),
                 ),
-                const Text('1 lesson'),
+                Text('1 ${AppLocalizations.of(context)!.lesson}'),
                 _tutorSection(currentClass['scheduleDetailInfo']['scheduleInfo']
                     ['tutorInfo']),
                 _scheduleSection(currentClass),
@@ -316,7 +317,7 @@ class _ScheduleState extends State<Schedule> {
                                                 ['startPeriodTimestamp'] *
                                             1000)));
                           },
-                          child: const Text('Join meeting'))
+                          child: Text(AppLocalizations.of(context)!.joinMeeting))
                     ],
                   ),
                 )
@@ -370,8 +371,8 @@ class _ScheduleState extends State<Schedule> {
               width: 150,
               height: 150,
             )),
-            const Text(
-              'Schedule',
+            Text(
+              AppLocalizations.of(context)!.schedule,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
             ),
             Padding(
@@ -384,19 +385,18 @@ class _ScheduleState extends State<Schedule> {
                     width: 4,
                   ),
                 )),
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.only(left: 5),
                   child: Text(
-                      'Here is a list of the sessions you have booked. \nYou can track when the meeting starts, join the meeting with one click or can cancel the meeting before 2 hours.'),
+                      AppLocalizations.of(context)!.scheduleDesc),
                 ),
               ),
             ),
             _isFirstLoading
                 ? const Center(child: CircularProgressIndicator())
                 : classesList.isEmpty
-                    ? const Center(
-                        child: Text(
-                        'There is no class!',
+                    ? Center(
+                        child: Text(AppLocalizations.of(context)!.noClass,
                         style: TextStyle(
                           fontSize: 20,
                         ),

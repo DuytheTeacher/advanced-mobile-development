@@ -237,15 +237,6 @@ class _HistoryState extends State<History> {
 
   @override
   Widget build(BuildContext context) {
-    final tutorProvider = Provider.of<TutorProvider>(context);
-    final classProvider = Provider.of<ClassProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
-
-    final histories =
-        classProvider.getHistoryByUserId(userProvider.currentUser?.id);
-
-    histories.sort((a, b) => a.schedule.compareTo(b.schedule));
-
     _historyCard(var currentClass) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),

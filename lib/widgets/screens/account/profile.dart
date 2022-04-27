@@ -32,22 +32,9 @@ class _ProfileState extends State<Profile> {
   var userDetail;
 
   @override
-  void initState() {
-    api = Api().api;
-    final userData = Provider.of<UserProvider>(context, listen: false);
-    setState(() {
-      _selectedDate = userData.currentUser?.birthday != null ? DateFormat("yyyy-MM-dd").parse(userData.currentUser?.birthday) : DateTime.now();
-      _phoneController.text = userData.currentUser?.phone;
-      _countryController = userData.currentUser?.country;
-      // _levelController = userData.currentUser?.level;
-      _imageUrl = userData.currentUser?.avatar;
-    });
-    super.initState();
-  }
-
-  @override
   void didChangeDependencies() async {
     try {
+      api = Api().api;
       var respCountries = await api.get('https://countriesnow.space/api/v0.1/countries/iso');
       respCountries.data['data'].forEach((item) {
         setState(() {
@@ -79,8 +66,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    final userData = Provider.of<UserProvider>(context);
-
     Future pickImage() async {
       try {
         final image =
@@ -175,6 +160,9 @@ class _ProfileState extends State<Profile> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(width: 1, color: Colors.blue),
+                    ),
                     onPressed: () {
                       _selectDate(context);
                     },
@@ -335,7 +323,7 @@ class _ProfileState extends State<Profile> {
         padding: const EdgeInsets.all(10),
         child: SizedBox(
           width: double.infinity,
-          child: Column(
+          child: userDetail != null ? Column(
             children: <Widget>[
               _infoSection(
                   userDetail?['name'].toString(), userDetail?['email'].toString()),
@@ -375,7 +363,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ],
-          ),
+          ) : const Center(child: CircularProgressIndicator(),),
         ),
       ),
       resizeToAvoidBottomInset: false,

@@ -147,15 +147,15 @@ class _TabbarState extends State<Tabbar> {
         selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Upcoming'),
-          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Tutors'),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: AppLocalizations.of(context)!.home),
+          BottomNavigationBarItem(icon: Icon(Icons.timer), label: AppLocalizations.of(context)!.upcoming),
+          BottomNavigationBarItem(icon: Icon(Icons.group), label: AppLocalizations.of(context)!.tutors),
           BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book_rounded), label: 'Courses'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+              icon: Icon(Icons.menu_book_rounded), label: AppLocalizations.of(context)!.courses),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: AppLocalizations.of(context)!.history),
           BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: 'Settings'),
+              icon: Icon(Icons.settings), label: AppLocalizations.of(context)!.settings),
         ],
       ),
       resizeToAvoidBottomInset: false,

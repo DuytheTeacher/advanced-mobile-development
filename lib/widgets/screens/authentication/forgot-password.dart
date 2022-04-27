@@ -1,5 +1,7 @@
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/api/notification_api.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -18,12 +20,14 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   final emailController = TextEditingController();
   final String logoTitle = 'LET TURTOR';
+  var api;
 
   @override
   void initState() {
     super.initState();
     NotificationApi.init();
     listenNotifications();
+    api = Api().api;
   }
 
   void listenNotifications() {
@@ -88,23 +92,29 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
             onPressed: () async {
-              final returnedPassword = await userData.recoveryPassword(emailController.text);
-              if (returnedPassword != null) {
+              try {
+                api = Api().api;
+                var resp = await api.post('/user/forgotPassword', data: { 'email': emailController.text });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(returnedPassword),
+                    content: Text(resp.data['message']),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Theme.of(context).accentColor,
                   ),
                 );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(userData.errorMessage),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: Theme.of(context).errorColor,
-                  ),
-                );
+              } on DioError catch (e) {
+                if (e.response != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.response?.data['message']),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(context).errorColor,
+                    ),
+                  );
+                } else {
+                  // Something happened in setting up or sending the request that triggered an Error
+                  print(e.message);
+                }
               }
             },
             child: const Text(

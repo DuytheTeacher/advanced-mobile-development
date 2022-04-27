@@ -39,6 +39,8 @@ class Api {
           return handler.resolve(await _retry(error.requestOptions));
         }
       }
+      prefs = await SharedPreferences.getInstance();
+      prefs.setString('authenticated', 'false');
       return handler.next(error);
     }));
   }

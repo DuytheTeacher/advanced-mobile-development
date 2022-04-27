@@ -39,5 +39,16 @@
     },
     "upcomingLesson": "Upcoming lesson",
     "enterLessonRoom": "Enter lesson room",
-    "thereIsNoUpcomingClass": "There is no upcoming class"
+    "thereIsNoUpcomingClass": "There is no upcoming class",
+    "upcoming": "Upcoming",
+    "joinMeeting": "Join meeting",
+    "cancelMeeting": "Cancel",
+    "lessonTime": "Lesson Time",
+    "scheduleDesc": "Here is a list of the sessions you have booked. \nYou can track when the meeting starts, join the meeting with one click or can cancel the meeting before 2 hours.",
+    "noClass": "There is no class!",
+    "lesson": "lesson",
+    "becomeTutor": "Become a tutor",
+    "favoriteTutors": "Favorite Tutors",
+    "changePassword": "Change password",
+    "logout": "Logout"
 }

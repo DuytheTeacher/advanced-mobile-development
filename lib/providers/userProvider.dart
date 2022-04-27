@@ -48,6 +48,7 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> login(email, password) async {
+    prefs = await SharedPreferences.getInstance();
     try {
       var resp = await api
           .post('/auth/login', data: {"email": email, "password": password});
@@ -58,6 +59,7 @@ class UserProvider with ChangeNotifier {
       };
       prefs.setString('auth', json.encode(token));
       prefs.setString('currentUser', resp.data['user'].toString());
+      prefs.setString('authenticated', 'true');
       _authenticated = true;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -67,6 +69,7 @@ class UserProvider with ChangeNotifier {
         print(e.message);
       }
       _authenticated = false;
+      prefs.setString('authenticated', 'false');
     }
     // saveData();
     notifyListeners();

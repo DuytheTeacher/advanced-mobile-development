@@ -19,6 +19,7 @@ import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -93,6 +94,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool authenticated = false;
+
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserProvider>(context);
