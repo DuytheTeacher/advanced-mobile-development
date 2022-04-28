@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.pushNamed(
                               context, VideoCall.routeName,
                               arguments: VideoCallArguments(
-                                  DateTime.fromMillisecondsSinceEpoch(_classesList[0]['scheduleDetailInfo']['scheduleInfo']['startTimestamp'])));
+                                  DateTime.fromMillisecondsSinceEpoch(_classesList[0]['scheduleDetailInfo']['scheduleInfo']['startTimestamp']), _classesList[0]));
                         },
                         child: Row(
                           mainAxisAlignment:

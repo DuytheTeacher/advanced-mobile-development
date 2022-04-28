@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.advanced_mobile_dev">
+    package="com.example.advanced_mobile_dev"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
    <application
+        tools:replace="android:label"
         android:label="advanced_mobile_dev"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

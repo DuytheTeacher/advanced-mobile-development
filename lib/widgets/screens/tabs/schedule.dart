@@ -313,9 +313,9 @@ class _ScheduleState extends State<Schedule> {
                             Navigator.pushNamed(context, VideoCall.routeName,
                                 arguments: VideoCallArguments(
                                     DateTime.fromMicrosecondsSinceEpoch(
-                                        currentClass['scheduleDetailInfo']
-                                                ['startPeriodTimestamp'] *
-                                            1000)));
+                                        currentClass['scheduleDetailInfo']['scheduleInfo']
+                                                ['startTimestamp'] *
+                                            1000), currentClass));
                           },
                           child: Text(AppLocalizations.of(context)!.joinMeeting))
                     ],
