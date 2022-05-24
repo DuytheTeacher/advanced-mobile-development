@@ -39,5 +39,16 @@
     },
     "upcomingLesson": "Lớp học tiếp theo",
     "enterLessonRoom": "Tham gia lớp học",
-    "thereIsNoUpcomingClass": "Hiện chưa có lớp học nào"
+    "thereIsNoUpcomingClass": "Hiện chưa có lớp học nào",
+    "upcoming": "Lịch học sắp tới",
+    "joinMeeting": "Tham gia lớp học",
+    "cancelMeeting": "Hủy lớp",
+    "lessonTime": "Thời gian học",
+    "scheduleDesc": "Đây là danh sách các lớp học mà bạn đã đặt.\nBạn có thể theo dõi khi nào lớp học bắt đầu, tham gia lớp học với một nhấn và có thể hủy lớp học trước 2 giờ.",
+    "noClass": "Chưa có lớp học nào!",
+    "lesson": "bài học",
+    "becomeTutor": "Đăng ký thành giáo viên",
+    "favoriteTutors": "Giáo viên yêu thích",
+    "changePassword": "Thay đổi mật khẩu",
+    "logout": "Đăng xuất"
 }

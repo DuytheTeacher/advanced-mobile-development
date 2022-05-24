@@ -1,3 +1,4 @@
+import 'package:advanced_mobile_dev/models/tutor-model.dart';
 import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
 import 'package:advanced_mobile_dev/widgets/common/tutor-list-only.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,10 @@ class _FavoriteTutorState extends State<FavoriteTutor> {
   @override
   Widget build(BuildContext context) {
     final tutorProvider = Provider.of<TutorProvider>(context);
-    final tutors = tutorProvider.getFavorite();
+    final tutors = tutorProvider.tutorsModelList;
+    final favorite = tutorProvider.tutorModelFavorites;
+
+    List<TutorModel> renderTutor = tutors.where((element) => favorite.contains(element.userId)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +46,7 @@ class _FavoriteTutorState extends State<FavoriteTutor> {
                   'Favorite Tutors',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                 ),
-                TutorList(tutorsList: tutors),
+                TutorList(tutorsList: renderTutor, favorites: favorite,),
               ],
             ),
           ),

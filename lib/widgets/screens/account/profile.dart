@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/providers/userProvider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,24 +27,45 @@ class _ProfileState extends State<Profile> {
   String? _countryController;
   String? _levelController;
   String? _imageUrl;
+  List<String> countryCodes = [];
+  var api;
+  var userDetail;
 
   @override
-  void initState() {
-    final userData = Provider.of<UserProvider>(context, listen: false);
-    setState(() {
-      _selectedDate = userData.currentUser.birthday;
-      _phoneController.text = userData.currentUser.phone;
-      _countryController = userData.currentUser.country;
-      _levelController = userData.currentUser.level;
-      _imageUrl = userData.currentUser.imageUrl;
-    });
-    super.initState();
+  void didChangeDependencies() async {
+    try {
+      api = Api().api;
+      var respCountries = await api.get('https://countriesnow.space/api/v0.1/countries/iso');
+      respCountries.data['data'].forEach((item) {
+        setState(() {
+          countryCodes.add(item['Iso2'].toString());
+        });
+      });
+      var respDetail = await api.get('/user/info');
+      setState(() {
+        userDetail = respDetail.data['user'];
+        _selectedDate = respDetail.data['user']['birthday'] != null ? DateFormat("yyyy-MM-dd").parse(respDetail.data['user']['birthday']) : DateTime.now();
+        _phoneController.text = respDetail.data['user']['phone'];
+        _countryController = respDetail.data['user']['country'];
+        _levelController = respDetail.data['user']['level'].toString().toUpperCase();
+        _imageUrl = respDetail.data['user']['avatar'];
+      });
+    } on DioError catch (e) {
+      if (e.response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.response?.data['message']), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
+        );
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
+
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    final userData = Provider.of<UserProvider>(context);
-
     Future pickImage() async {
       try {
         final image =
@@ -62,7 +85,7 @@ class _ProfileState extends State<Profile> {
       }
     }
 
-    _infoSection(String fullName, String email) {
+    _infoSection(String? fullName, String? email) {
       final imageTemp = File(_imageUrl!);
 
       return SizedBox(
@@ -94,13 +117,13 @@ class _ProfileState extends State<Profile> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Text(
-                fullName,
+                fullName ?? '',
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             Text(
-              email,
+              email ?? '',
               style: const TextStyle(color: Colors.grey),
             )
           ],
@@ -137,6 +160,9 @@ class _ProfileState extends State<Profile> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(width: 1, color: Colors.blue),
+                    ),
                     onPressed: () {
                       _selectDate(context);
                     },
@@ -223,7 +249,7 @@ class _ProfileState extends State<Profile> {
                     borderSide: BorderSide(color: Color(0xFFD6D6D6)),
                   ),
                 ),
-                items: <String>['Vietnam', 'US', 'UK'].map((String value) {
+                items: countryCodes.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -271,7 +297,7 @@ class _ProfileState extends State<Profile> {
                     borderSide: BorderSide(color: Color(0xFFD6D6D6)),
                   ),
                 ),
-                items: <String>['Beginner', 'Intermediate', 'Advanced']
+                items: ['BEGINNER', 'INTERMEDIATE', 'PROFICIENCY']
                     .map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -297,10 +323,10 @@ class _ProfileState extends State<Profile> {
         padding: const EdgeInsets.all(10),
         child: SizedBox(
           width: double.infinity,
-          child: Column(
+          child: userDetail != null ? Column(
             children: <Widget>[
               _infoSection(
-                  userData.currentUser.fullName, userData.currentUser.email),
+                  userDetail?['name'].toString(), userDetail?['email'].toString()),
               _birthdaySection(context),
               _phoneSection(_phoneController),
               _countrySection(),
@@ -310,13 +336,17 @@ class _ProfileState extends State<Profile> {
                 child: SizedBox(
                   width: 300,
                   child: ElevatedButton(
-                    onPressed: () {
-                      userData.updateProfile(
-                          _selectedDate,
-                          _phoneController.text,
-                          _countryController!,
-                          _levelController!,
-                          _imageUrl!);
+                    onPressed: () async {
+                      var body = {
+                        "country": _countryController.toString(),
+                        "phone": _phoneController.text,
+                        "birthday": DateFormat('yyyy-MM-dd').format(_selectedDate),
+                        "level": _levelController.toString().toUpperCase(),
+                      };
+                      var resp = await api.put('/user/info', data: body);
+                      setState(() {
+                        userDetail = resp.data['user'];
+                      });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: const Text('Save profile successfully!'),
@@ -333,7 +363,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ],
-          ),
+          ) : const Center(child: CircularProgressIndicator(),),
         ),
       ),
       resizeToAvoidBottomInset: false,

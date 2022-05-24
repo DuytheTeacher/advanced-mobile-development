@@ -1,11 +1,10 @@
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/providers/classProvider.dart';
-import 'package:advanced_mobile_dev/providers/tutorsProvider.dart';
-import 'package:advanced_mobile_dev/providers/userProvider.dart';
-import 'package:advanced_mobile_dev/widgets/screens/tutors/tutor-detail.dart';
 import 'package:advanced_mobile_dev/widgets/screens/tutors/video-call.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Schedule extends StatefulWidget {
   const Schedule({Key? key}) : super(key: key);
@@ -17,10 +16,13 @@ class Schedule extends StatefulWidget {
 class _ScheduleState extends State<Schedule> {
   bool _isFirstLoading = false;
   bool _isMoreLoading = false;
-  int _page = 0;
+  int _page = 1;
   final int _limit = 5;
   bool _hasNextPage = true;
   late ScrollController _controller;
+
+  var api;
+  var classesList;
 
   List<Class> classes = [];
 
@@ -37,18 +39,47 @@ class _ScheduleState extends State<Schedule> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() async {
+    api = Api().api;
+    super.didChangeDependencies();
+  }
+
   void _firstLoad() async {
     setState(() {
       _isFirstLoading = true;
-      _page = 0;
+      _page = 1;
       _hasNextPage = true;
     });
 
-    final allClasses =
-        Provider.of<ClassProvider>(context, listen: false).classes;
-    classes = allClasses.sublist(
-        0, allClasses.length > _limit ? _limit : allClasses.length);
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      api = Api().api;
+      var resp = await api.get('/booking/list/student', queryParameters: {
+        'page': _page,
+        'perPage': _limit,
+        'dateTimeGte': (DateTime.now().subtract(const Duration(minutes: 5)))
+                .microsecondsSinceEpoch /
+            1000,
+        'orderBy': 'meeting',
+        'sortBy': 'asc'
+      });
+      setState(() {
+        classesList = resp.data['data']['rows'];
+      });
+    } on DioError catch (e) {
+      if (e.response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.response?.data['message']),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Theme.of(context).errorColor,
+          ),
+        );
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
 
     setState(() {
       _isFirstLoading = false;
@@ -62,26 +93,36 @@ class _ScheduleState extends State<Schedule> {
         _controller.position.extentAfter < 100) {
       setState(() {
         _isMoreLoading = true;
+        _page += 1;
       });
 
-      final classProvider = Provider.of<ClassProvider>(context, listen: false);
-
-      await Future.delayed(const Duration(milliseconds: 1000));
-      _page += 1;
-      int total = classes.length;
-      int ending = _limit * (_page + 1);
-
-      setState(() {
-        if (total < _limit) {
-          _hasNextPage = false;
-          return;
-        } else if (ending <= total) {
-          classes.addAll(classProvider.classes.sublist(_limit * _page, ending));
+      try {
+        var resp = await api.get('/booking/list/student', queryParameters: {
+          'page': _page,
+          'perPage': _limit,
+          'dateTimeGte': (DateTime.now().subtract(const Duration(minutes: 5)))
+                  .microsecondsSinceEpoch /
+              1000,
+          'orderBy': 'meeting',
+          'sortBy': 'asc'
+        });
+        setState(() {
+          classesList.addAll(resp.data['data']['rows']);
+        });
+      } on DioError catch (e) {
+        if (e.response != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.response?.data['message']),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Theme.of(context).errorColor,
+            ),
+          );
         } else {
-          classes.addAll(classProvider.classes.sublist(_limit * _page));
-          _hasNextPage = false;
+          // Something happened in setting up or sending the request that triggered an Error
+          print(e.message);
         }
-      });
+      }
 
       setState(() {
         _isMoreLoading = false;
@@ -89,7 +130,7 @@ class _ScheduleState extends State<Schedule> {
     }
   }
 
-  _tutorSection(Tutor tutorDetail) {
+  _tutorSection(var tutorDetail) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
@@ -105,7 +146,7 @@ class _ScheduleState extends State<Schedule> {
                   child: CircleAvatar(
                     child: ClipOval(
                       child: Image.network(
-                        tutorDetail.imageUrl,
+                        tutorDetail['avatar'],
                         width: 60,
                         height: 60,
                         fit: BoxFit.cover,
@@ -121,11 +162,11 @@ class _ScheduleState extends State<Schedule> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, TutorDetail.routeName,
-                              arguments: TutorDetailArguments(tutorDetail.id));
+                          // Navigator.pushNamed(context, TutorDetail.routeName,
+                          //     arguments: TutorDetailArguments(tutorDetail.id));
                         },
                         child: Text(
-                          tutorDetail.name,
+                          tutorDetail['name'],
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -133,7 +174,7 @@ class _ScheduleState extends State<Schedule> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          tutorDetail.country,
+                          tutorDetail['country'],
                           style: const TextStyle(
                               fontSize: 12, color: Color(0xFF616161)),
                         ),
@@ -147,7 +188,7 @@ class _ScheduleState extends State<Schedule> {
     );
   }
 
-  _scheduleSection(Class currentClass) {
+  _scheduleSection(var currentClass) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Container(
@@ -164,7 +205,7 @@ class _ScheduleState extends State<Schedule> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
-                    'Lesson Time: ${DateFormat.jm().format(currentClass.schedule)} - ${DateFormat.jm().format(currentClass.schedule.add(const Duration(hours: 1, minutes: 30)))}',
+                    '${AppLocalizations.of(context)!.lessonTime}: ${DateFormat.jm().format(DateTime.fromMicrosecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['startTimestamp'] * 1000))} - ${DateFormat.jm().format(DateTime.fromMicrosecondsSinceEpoch(currentClass['scheduleDetailInfo']['scheduleInfo']['endTimestamp'] * 1000))}',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -179,19 +220,12 @@ class _ScheduleState extends State<Schedule> {
                         setState(() {
                           _isFirstLoading = true;
                         });
-
-                        final classProvider =
-                            Provider.of<ClassProvider>(context, listen: false);
-                        Class nextClass =
-                            classProvider.getClassById(currentClass.id);
-                        bool ableToCancel = DateTime.now().isBefore(nextClass
-                            .schedule
-                            .subtract(const Duration(hours: 2)));
-
-                        await Future.delayed(const Duration(milliseconds: 500));
-
-                        if (ableToCancel) {
-                          classProvider.cancelClass(currentClass.id);
+                        try {
+                          var resp = await api.delete('/booking', data: {
+                            "scheduleDetailIds": [
+                              currentClass['scheduleDetailInfo']['id']
+                            ]
+                          });
                           _firstLoad();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -200,31 +234,34 @@ class _ScheduleState extends State<Schedule> {
                               backgroundColor: Theme.of(context).accentColor,
                             ),
                           );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                  'Cancel Failed! You can only cancel 2 hours in advanced'),
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Theme.of(context).errorColor,
-                            ),
-                          );
+                        } on DioError catch (e) {
+                          if (e.response != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.response?.data['message']),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Theme.of(context).errorColor,
+                              ),
+                            );
+                          } else {
+                            // Something happened in setting up or sending the request that triggered an Error
+                            print(e.message);
+                          }
                         }
-
                         setState(() {
                           _isFirstLoading = false;
                         });
                       },
                       child: Row(
-                        children: const <Widget>[
-                          Icon(
+                        children: <Widget>[
+                          const Icon(
                             Icons.cancel_outlined,
                             color: Colors.red,
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 5),
                             child: Text(
-                              'Cancel',
+                              AppLocalizations.of(context)!.cancelMeeting,
                               style: TextStyle(color: Colors.red),
                             ),
                           )
@@ -241,19 +278,7 @@ class _ScheduleState extends State<Schedule> {
 
   @override
   Widget build(BuildContext context) {
-    final tutorProvider = Provider.of<TutorProvider>(context);
-    final classProvider = Provider.of<ClassProvider>(context);
-    final userProvider = Provider.of<UserProvider>(context);
-
-    final upcomingClasses =
-        classProvider.getClassByUserId(userProvider.currentUser.id);
-
-    upcomingClasses.sort((a, b) => a.schedule.compareTo(b.schedule));
-
-    _scheduleCard(Class currentClass) {
-      final tutorDetail =
-          tutorProvider.getTutorDetailById(currentClass.tutorId);
-
+    _scheduleCard(var currentClass) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Container(
@@ -266,12 +291,17 @@ class _ScheduleState extends State<Schedule> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  DateFormat('E, d MMMM y').format(currentClass.schedule),
+                  DateFormat('E, d MMMM y').format(
+                      DateTime.fromMicrosecondsSinceEpoch(
+                          currentClass['scheduleDetailInfo']['scheduleInfo']
+                                  ['startTimestamp'] *
+                              1000)),
                   style: const TextStyle(
                       fontWeight: FontWeight.w900, fontSize: 28),
                 ),
-                const Text('1 lesson'),
-                _tutorSection(tutorDetail),
+                Text('1 ${AppLocalizations.of(context)!.lesson}'),
+                _tutorSection(currentClass['scheduleDetailInfo']['scheduleInfo']
+                    ['tutorInfo']),
                 _scheduleSection(currentClass),
                 SizedBox(
                   width: double.infinity,
@@ -281,10 +311,13 @@ class _ScheduleState extends State<Schedule> {
                       ElevatedButton(
                           onPressed: () {
                             Navigator.pushNamed(context, VideoCall.routeName,
-                                arguments:
-                                    VideoCallArguments(currentClass.schedule));
+                                arguments: VideoCallArguments(
+                                    DateTime.fromMicrosecondsSinceEpoch(
+                                        currentClass['scheduleDetailInfo']['scheduleInfo']
+                                                ['startTimestamp'] *
+                                            1000), currentClass));
                           },
-                          child: const Text('Join meeting'))
+                          child: Text(AppLocalizations.of(context)!.joinMeeting))
                     ],
                   ),
                 )
@@ -304,9 +337,9 @@ class _ScheduleState extends State<Schedule> {
               shrinkWrap: true,
               controller: _controller,
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: upcomingClasses.length,
+              itemCount: classesList.length,
               itemBuilder: (BuildContext context, int index) {
-                Class currentClass = upcomingClasses[index];
+                var currentClass = classesList[index];
                 return Center(child: _scheduleCard(currentClass));
               },
               separatorBuilder: (BuildContext context, int index) =>
@@ -338,8 +371,8 @@ class _ScheduleState extends State<Schedule> {
               width: 150,
               height: 150,
             )),
-            const Text(
-              'Schedule',
+            Text(
+              AppLocalizations.of(context)!.schedule,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
             ),
             Padding(
@@ -352,19 +385,18 @@ class _ScheduleState extends State<Schedule> {
                     width: 4,
                   ),
                 )),
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.only(left: 5),
                   child: Text(
-                      'Here is a list of the sessions you have booked. \nYou can track when the meeting starts, join the meeting with one click or can cancel the meeting before 2 hours.'),
+                      AppLocalizations.of(context)!.scheduleDesc),
                 ),
               ),
             ),
             _isFirstLoading
                 ? const Center(child: CircularProgressIndicator())
-                : classes.isEmpty
-                    ? const Center(
-                        child: Text(
-                        'There is no class!',
+                : classesList.isEmpty
+                    ? Center(
+                        child: Text(AppLocalizations.of(context)!.noClass,
                         style: TextStyle(
                           fontSize: 20,
                         ),

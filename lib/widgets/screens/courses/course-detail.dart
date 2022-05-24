@@ -17,28 +17,18 @@ class CourseDetail extends StatefulWidget {
 }
 
 class _CourseDetailState extends State<CourseDetail> {
-  Course courseDetail = Course(
-      id: '',
-      imageUrl: '',
-      name: '',
-      description: '',
-      reason: '',
-      abilities: '',
-      exLevel: '',
-      contentUrl: '');
+  var courseDetail;
 
   @override
-  initState() {
-    Future.delayed(Duration.zero, () {
-      final args =
-          ModalRoute.of(context)!.settings.arguments as CourseDetailArgument;
+  didChangeDependencies() {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as CourseDetailArgument;
 
-      setState(() {
-        courseDetail = args.course;
-      });
+    setState(() {
+      courseDetail = args.course;
     });
 
-    super.initState();
+    super.didChangeDependencies();
   }
 
   _coursesCard() {
@@ -50,13 +40,13 @@ class _CourseDetailState extends State<CourseDetail> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Image.network(
-              courseDetail.imageUrl,
+              courseDetail['imageUrl'],
               fit: BoxFit.cover,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Text(
-                courseDetail.name,
+                courseDetail['name'],
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
@@ -64,18 +54,17 @@ class _CourseDetailState extends State<CourseDetail> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                courseDetail.description,
+                courseDetail['description'],
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 20, bottom: 10, left: 10),
               child: ElevatedButton(
-                  onPressed: () async {
-                    final file = await PDFApi.loadNetwork(courseDetail.contentUrl);
-                    // Navigator.pushNamed(context, CourseContent.routeName);
-                    openPDF(context, file);
-                  }, child: const Text('Discover')),
+                  onPressed: () {
+
+                  },
+                  child: const Text('Discover')),
             ),
           ],
         ),
@@ -83,7 +72,12 @@ class _CourseDetailState extends State<CourseDetail> {
     );
   }
 
-  void openPDF(BuildContext context, File file) => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CourseContent(file: file, course: courseDetail,)));
+  void openPDF(BuildContext context, File file) =>
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CourseContent(
+                file: file,
+                course: courseDetail,
+              )));
 
   _overviewSection() {
     return Column(
@@ -110,7 +104,7 @@ class _CourseDetailState extends State<CourseDetail> {
           ),
         ),
         Text(
-          courseDetail.reason,
+          courseDetail['reason'],
           style: const TextStyle(color: Colors.grey),
         ),
         Padding(
@@ -127,7 +121,7 @@ class _CourseDetailState extends State<CourseDetail> {
           ),
         ),
         Text(
-          courseDetail.abilities,
+          courseDetail['purpose'],
           style: const TextStyle(color: Colors.grey),
         )
       ],
@@ -155,7 +149,7 @@ class _CourseDetailState extends State<CourseDetail> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
-                child: Text(courseDetail.exLevel,
+                child: Text(courseDetail['level'],
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w600)),
               )
@@ -167,6 +161,14 @@ class _CourseDetailState extends State<CourseDetail> {
   }
 
   _lengthSection() {
+    var topics = courseDetail['topics'].toList();
+    topics.sort((a, b) {
+      if (a['orderCourse'] > b['orderCourse']) {
+        return 1;
+      }
+      return -1;
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -185,13 +187,36 @@ class _CourseDetailState extends State<CourseDetail> {
                 Icons.menu_book_outlined,
                 color: Theme.of(context).primaryColor,
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(left: 10),
-                child: Text('9 lessons',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                child: Text('${topics.length} topics',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
               )
             ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Column(
+            children: topics.map<Widget>((element) {
+              return GestureDetector(
+                onTap: () async {
+                  final file = await PDFApi.loadNetwork(
+                      element['nameFile']);
+                  // Navigator.pushNamed(context, CourseContent.routeName);
+                  openPDF(context, file);
+                },
+                child: ListTile(
+                  leading: Icon(
+                    Icons.arrow_right_alt_outlined,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  title: Text(element['name']),
+                  subtitle: Text('Topic ${element['orderCourse'] + 1}'),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -219,7 +244,7 @@ class _CourseDetailState extends State<CourseDetail> {
 }
 
 class CourseDetailArgument {
-  final Course course;
+  var course;
 
   CourseDetailArgument(this.course);
 }

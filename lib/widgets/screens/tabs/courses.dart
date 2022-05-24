@@ -1,5 +1,7 @@
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:advanced_mobile_dev/widgets/common/courses-list.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -50,7 +52,7 @@ class _CoursesState extends State<Courses> {
                 ),
               ),
             ),
-            coursesProvider.courses.isEmpty ? const Center(child: Text('There is no course!', style: TextStyle(fontSize: 20),),) : CoursesList(coursesList: coursesProvider.courses),
+            coursesProvider.courses.isEmpty ? const Center(child: Text('There is no course!', style: TextStyle(fontSize: 20),),) : CoursesList(query: ''),
           ],
         ),
       ),

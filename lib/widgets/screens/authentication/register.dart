@@ -15,7 +15,6 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmedPasswordController = TextEditingController();
@@ -32,22 +31,6 @@ class _RegisterState extends State<Register> {
         key: _formKey,
         child: Column(
           children: <Widget>[
-            TextFormField(
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Full name can not be empty!';
-                }
-                if (value.length < 3) {
-                  return 'Full name can not less than 3 characters!';
-                }
-                return null;
-              },
-              decoration: const InputDecoration(
-                  labelText: 'Full name *', hintText: 'Name'),
-              controller: fullNameController,
-              enableSuggestions: false,
-              autocorrect: false,
-            ),
             const SizedBox(height: 20),
             TextFormField(
               validator: (value) {
@@ -114,22 +97,29 @@ class _RegisterState extends State<Register> {
                 fixedSize: const Size(300, 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50))),
-            onPressed: () {
+            onPressed: () async {
               if (!_formKey.currentState!.validate()) {
                 return;
-              } else if (userData.isEmailExisted(emailController.text)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: const Text(
-                          'Email has already existed! Please check again!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
-                );
               } else {
-                userData.register(emailController.text, passwordController.text,
-                    fullNameController.text);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Register Successfully!'), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).accentColor,),
-                );
+                if (await userData.register(
+                    emailController.text, passwordController.text)) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Register Successfully!'),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(context).accentColor,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(userData.errorMessage),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Theme.of(context).errorColor,
+                    ),
+                  );
+                }
               }
             },
             child: const Text(
@@ -197,8 +187,9 @@ class _RegisterState extends State<Register> {
     }
 
     return Scaffold(
-      appBar:
-          AppBar(title: Text(AppLocalizations.of(context)!.register), automaticallyImplyLeading: false),
+      appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.register),
+          automaticallyImplyLeading: false),
       body: Container(
         padding: const EdgeInsets.all(40),
         child: Column(

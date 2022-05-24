@@ -1,12 +1,14 @@
+import 'package:advanced_mobile_dev/api/api.dart';
 import 'package:advanced_mobile_dev/providers/courseProvider.dart';
 import 'package:advanced_mobile_dev/widgets/screens/courses/course-detail.dart';
+import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 
 class CoursesList extends StatefulWidget {
-  CoursesList({Key? key, required this.coursesList}) : super(key: key);
+  CoursesList({Key? key, required this.query}) : super(key: key);
 
-  List<Course> coursesList;
+  String query;
 
   @override
   State<CoursesList> createState() => _CoursesList();
@@ -15,13 +17,14 @@ class CoursesList extends StatefulWidget {
 class _CoursesList extends State<CoursesList> {
   int _page = 0;
   final int _limit = 10;
+  var api;
 
   bool _hasNextPage = true;
   bool _isFirstLoadRunning = false;
   bool _isLoadMoreRunning = false;
   late ScrollController _controller;
 
-  List<Course> courses = [];
+  var courses = [];
 
   @override
   initState() {
@@ -38,7 +41,6 @@ class _CoursesList extends State<CoursesList> {
 
   @override
   void didUpdateWidget(covariant CoursesList oldWidget) {
-    courses = widget.coursesList;
     _firstLoad();
     super.didUpdateWidget(oldWidget);
   }
@@ -47,14 +49,26 @@ class _CoursesList extends State<CoursesList> {
     setState(() {
       _isFirstLoadRunning = true;
       _hasNextPage = true;
-      _page = 0;
+      _page = 1;
     });
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    api = Api().api;
+    try {
+      var resp = await api.get('/course', queryParameters: { 'page': 1, 'size': _limit });
+      courses = resp.data['data']['rows'];
+      courses = courses.where((element) => element['name'].toString().toLowerCase().contains(widget.query.toLowerCase())).toList();
+    } on DioError catch (e) {
+      if (e.response != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.response?.data['message']), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
+        );
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print(e.message);
+      }
+    }
 
     setState(() {
-      courses = widget.coursesList.sublist(
-          0, widget.coursesList.length > 10 ? 10 : widget.coursesList.length);
       _isFirstLoadRunning = false;
     });
   }
@@ -70,20 +84,24 @@ class _CoursesList extends State<CoursesList> {
 
       await Future.delayed(const Duration(milliseconds: 500));
       _page += 1;
-      int total = widget.coursesList.length;
-      int ending = _limit * (_page + 1);
-
-      setState(() {
-        if (total < _limit) {
-          _hasNextPage = false;
-          return;
-        } else if (ending <= total) {
-          courses.addAll(widget.coursesList.sublist(_limit * _page, ending));
-        } else {
-          courses.addAll(widget.coursesList.sublist(_limit * _page));
+      try {
+        var resp = await api.get('/course', queryParameters: { 'page': _page, 'size': _limit });
+        var nextPage = resp.data['data']['rows'];
+        courses.addAll(nextPage);
+        courses = courses.where((element) => element['name'].toString().toLowerCase().contains(widget.query.toLowerCase())).toList();
+        if (nextPage.length < _limit) {
           _hasNextPage = false;
         }
-      });
+      } on DioError catch (e) {
+        if (e.response != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.response?.data['message']), behavior: SnackBarBehavior.floating, backgroundColor: Theme.of(context).errorColor,),
+          );
+        } else {
+          // Something happened in setting up or sending the request that triggered an Error
+          print(e.message);
+        }
+      }
 
       setState(() {
         _isLoadMoreRunning = false;
@@ -91,7 +109,7 @@ class _CoursesList extends State<CoursesList> {
     }
   }
 
-  _coursesCard(Course course) {
+  _coursesCard(course) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
       child: SizedBox(
@@ -106,20 +124,20 @@ class _CoursesList extends State<CoursesList> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Image.network(
-                  course.imageUrl,
+                  course['imageUrl'],
                   fit: BoxFit.cover,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    course.name,
+                    course['name'],
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                   child: Text(
-                    course.description,
+                    course['description'],
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ),
@@ -155,7 +173,7 @@ class _CoursesList extends State<CoursesList> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: courses.length,
                     itemBuilder: (BuildContext context, int index) {
-                      Course course = courses[index];
+                      var course = courses[index];
                       return Center(
                           child: _coursesCard(
                         course,

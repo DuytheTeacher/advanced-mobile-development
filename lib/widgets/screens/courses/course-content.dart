@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 
 class CourseContent extends StatefulWidget {
   final File file;
-  final Course course;
+  var course;
 
   static String routeName = '/course-content';
 
@@ -24,7 +24,7 @@ class _CourseContentState extends State<CourseContent> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.course.name;
+    final name = widget.course['name'];
     final text = '${_indexPage + 1} of $_pages';
 
     return Scaffold(
